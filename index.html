@@ -517,8 +517,10 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
 .tpl-wechat-report .slide.thanks { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
 
 </style>
+<style>.edit-hint{display:none;position:fixed;top:8px;right:12px;background:#f5a524;color:#000;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;z-index:999;letter-spacing:.06em}</style>
 </head>
 <body class="tpl-wechat-report" contenteditable="true">
+<div class="edit-hint">✏️ 编辑模式 · 按 E 退出</div>
 <div class="deck">
 
   <!-- ═══════════ 1. COVER ═══════════ -->
@@ -967,7 +969,7 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
 </div>
 
 <div style="position:fixed;bottom:12px;left:12px;font-size:11px;color:#484f5866;z-index:100;pointer-events:none">
-  S 演讲者视图 · T 切换主题 · ← → 翻页 · F 全屏 · O 总览 · R 重置计时
+  E 编辑模式 · S 演讲者视图 · T 切换主题 · ← → 翻页 · F 全屏 · O 总览
 </div>
 
 <script>
@@ -1079,7 +1081,6 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
     }
 
     let idx = 0;
-    window.__editorActive = false;
     const total = slides.length;
 
     /* ===== BroadcastChannel for presenter sync ===== */
@@ -1486,6 +1487,7 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
   body.is-dragging-card * { user-select: none !important; }
   body.is-dragging-card iframe { pointer-events: none !important; }
 </style>
+<style>.edit-hint{display:none;position:fixed;top:8px;right:12px;background:#f5a524;color:#000;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;z-index:999;letter-spacing:.06em}</style>
 </head>
 <body>
 
@@ -1841,8 +1843,6 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
   timerCount.textContent = (idx + 1) + ' / ' + total;
 })();
 </` + `script>
-
-<!-- OFFLINE EDITION — all assets inlined, speaker notes editable -->
 </body></html>`;
     }
 
@@ -1908,7 +1908,8 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
     }
 
     document.addEventListener('keydown', function (e) {
-      if (e.metaKey||e.ctrlKey||e.altKey) return; if (window.__editorActive) return; switch (e.key) {
+      if (e.metaKey||e.ctrlKey||e.altKey) return;
+      switch (e.key) {
         case 'ArrowRight': case ' ': case 'PageDown': case 'Enter': go(idx+1); e.preventDefault(); break;
         case 'ArrowLeft': case 'PageUp': case 'Backspace': go(idx-1); e.preventDefault(); break;
         case 'Home': go(0); break;
@@ -1917,7 +1918,6 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
         case 's': case 'S': openPresenterWindow(); break;
         case 'n': case 'N': toggleNotes(); break;
         case 'o': case 'O': toggleOverview(); break;
-        case 'e': case 'E': window.__editorActive = !window.__editorActive; document.body.style.outline = window.__editorActive ? '3px solid #f5a524' : ''; e.preventDefault(); break;
         case 't': case 'T': cycleTheme(); break;
         case 'a': case 'A': cycleAnim(); break;
         case 'Escape': toggleOverview(false); toggleNotes(false); break;
@@ -1937,6 +1937,33 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
 
 </script>
 
-<!-- OFFLINE EDITION — all assets inlined, speaker notes editable -->
+<script>
+(function(){
+  window.__editorActive = false;
+  document.addEventListener('keydown', function(e){
+    // E toggles editing mode
+    if ((e.key === 'e' || e.key === 'E') && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      window.__editorActive = !window.__editorActive;
+      document.body.style.outline = window.__editorActive ? '3px solid #f5a524' : '';
+      // Update hint
+      var hint = document.querySelector('.edit-hint');
+      if (hint) hint.style.display = window.__editorActive ? '' : 'none';
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return;
+    }
+    // When editing, block all navigation keys
+    if (window.__editorActive) {
+      var k = e.key;
+      if (k === 'ArrowRight' || k === 'ArrowLeft' || k === ' ' || k === 'PageDown' || k === 'PageUp' || k === 'Backspace' || k === 'Enter' || k === 'Home' || k === 'End' || k === 'f' || k === 'F' || k === 's' || k === 'S' || k === 'n' || k === 'N' || k === 'o' || k === 'O' || k === 't' || k === 'T' || k === 'a' || k === 'A') {
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+      }
+    }
+  }, true); // capture phase — fires BEFORE runtime.js bubble listener
+})();
+</script>
+
 </body>
 </html>
