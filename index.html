@@ -1079,6 +1079,7 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
     }
 
     let idx = 0;
+    window.__editorActive = false;
     const total = slides.length;
 
     /* ===== BroadcastChannel for presenter sync ===== */
@@ -1907,8 +1908,7 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
     }
 
     document.addEventListener('keydown', function (e) {
-      if (e.metaKey||e.ctrlKey||e.altKey) return;
-      switch (e.key) {
+      if (e.metaKey||e.ctrlKey||e.altKey) return; if (window.__editorActive) return; switch (e.key) {
         case 'ArrowRight': case ' ': case 'PageDown': case 'Enter': go(idx+1); e.preventDefault(); break;
         case 'ArrowLeft': case 'PageUp': case 'Backspace': go(idx-1); e.preventDefault(); break;
         case 'Home': go(0); break;
@@ -1917,6 +1917,7 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
         case 's': case 'S': openPresenterWindow(); break;
         case 'n': case 'N': toggleNotes(); break;
         case 'o': case 'O': toggleOverview(); break;
+        case 'e': case 'E': window.__editorActive = !window.__editorActive; document.body.style.outline = window.__editorActive ? '3px solid #f5a524' : ''; e.preventDefault(); break;
         case 't': case 'T': cycleTheme(); break;
         case 'a': case 'A': cycleAnim(); break;
         case 'Escape': toggleOverview(false); toggleNotes(false); break;
