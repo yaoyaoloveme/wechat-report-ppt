@@ -517,10 +517,10 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
 .tpl-wechat-report .slide.thanks { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
 
 </style>
-<style>.edit-hint{display:none;position:fixed;top:8px;right:12px;background:#f5a524;color:#000;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;z-index:999;letter-spacing:.06em}</style>
+<style>.edit-hint{display:none;position:fixed;top:8px;right:12px;background:#f5a524;color:#000;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;z-index:999;letter-spacing:.06em}body.editing .notes{display:block!important;position:absolute;bottom:0;left:0;right:0;background:rgba(255,248,230,.95);border-top:2px dashed #f5a524;padding:12px 24px;font-size:14px;line-height:1.8;color:#333;z-index:50;max-height:28vh;overflow-y:auto}body.editing .notes p,body.editing .notes strong,body.editing .notes em{color:#333!important}body.editing .slide{padding-bottom:28vh!important}</style>
 </head>
-<body class="tpl-wechat-report" contenteditable="true">
-<div class="edit-hint">✏️ 编辑模式 · 按 E 退出</div>
+<body class="tpl-wechat-report">
+<div class="edit-hint">✏️ 编辑中 · ESC 保存并退出</div>
 <div class="deck">
 
   <!-- ═══════════ 1. COVER ═══════════ -->
@@ -633,10 +633,13 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
     <h2 class="h2">2. 行业数据对比</h2>
     <table class="data-table mt-m">
       <tr><th>行业</th><th>日均升级量</th><th>和解率</th><th>平均通话</th><th>类目特征</th><th>适合度</th></tr>
-      <tr><td><strong>衣帽箱包</strong></td><td><strong>1,560</strong></td><td><strong>84%</strong></td><td><strong>228s</strong></td><td>诉求明确（尺码/颜色/质量）</td><td><span class="tag tag-g">★★★★★</span></td></tr>
+      <tr><td><strong>衣帽箱包</strong></td><td><strong>1,560</strong></td><td><strong>84%</strong></td><td><strong>228s</strong></td><td>诉求明确（尺码/颜色/质量）</td><td><span class="tag tag-g">★★★★★ 首选</span></td></tr>
       <tr><td>食品生鲜</td><td>400</td><td>-</td><td>230s</td><td>主观性强（保质期/感官）</td><td><span class="tag tag-y">★★★</span></td></tr>
-      <tr><td>3C数码</td><td>121</td><td>-</td><td>257s</td><td>需技术判断（功能/兼容性）</td><td><span class="tag tag-y">★★★</span></td></tr>
-      <tr><td>珠宝文玩</td><td>51</td><td>-</td><td>300s</td><td>极高主观性（真假/价值评估）</td><td><span class="tag tag-r">不适合</span></td></tr>
+      <tr><td>普通综合</td><td>409</td><td>-</td><td>260s</td><td>需技术判断（功能/兼容性）</td><td><span class="tag tag-y">★★★</span></td></tr>
+      <tr><td>3C数码</td><td>121</td><td>-</td><td>257s</td><td>极高主观性（真假/价值评估）</td><td><span class="tag tag-r">不适合</span></td></tr>
+      <tr><td>珠宝文玩</td><td>51</td><td>-</td><td>300s</td><td>真假鉴定难（依赖专业机构）</td><td><span class="tag tag-r">不适合</span></td></tr>
+      <tr><td>虚拟产品</td><td>46</td><td>-</td><td>215s</td><td>课程/会员/充值类（举证困难）</td><td><span class="tag tag-r">不适合</span></td></tr>
+      <tr><td>美妆母婴</td><td>112</td><td>-</td><td>220s</td><td>过敏/不适（因果关系难界定）</td><td><span class="tag tag-r">不适合</span></td></tr>
     </table>
     <p class="fz-sm mt-m">衣帽箱包84%和解率居首。客诉以尺码不符、颜色差异、面料质量、物流时效为核心——诉求明确、判责标准清晰、用户期望可控。<strong>标准化的确定性越高，AI的能力边界越清晰，人机分工越明确。</strong></p>
     <aside class="notes">
@@ -775,6 +778,7 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
       <div class="label">📋 极速退款播报话术</div>
       <p><b>场景A·已回款+商家愿意处理：</b>"您好，这里是微信小店官方客服。关于您此前享受极速退款的订单，经核实商家已确认您的退款申请并进行处理。如已收到退款请按1号键确认，如尚未收到请按2号键。"</p>
       <p><b>场景B·已回款+商家拒绝→谈赔：</b>"您好，关于您反馈的问题，考虑到您已享受极速退款服务且商家未能满足诉求，为保障您的服务体验，我们为您申请了一笔平台服务体验金作为补偿，预计1-3个工作日入账至您的微信零钱。如接受请按1号键，如需进一步协商请按2号键。"</p>
+      <p><b>场景C·不认可A/B方案：</b>"很抱歉给您添麻烦了，由于您的订单已享受了平台的极速退款，目前暂不支持线上的二次退款，建议您可再次联系商家进行协商。"</p>
     </div>
     <aside class="notes">
       <p>极速退款是三个场景里最特别的。它的判断变量跟另外两个完全不同——不看复杂度，看<strong>回款状态</strong>。</p>
@@ -876,14 +880,15 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
       <div>
         <h4 class="h3">分场景量化指标</h4>
         <table class="data-table small">
-          <tr><th>指标</th><th>当前</th><th>目标</th><th>提升</th></tr>
-          <tr><td>单均非沟通耗时</td><td>10min</td><td><span class="tag tag-g"><1min</span></td><td>↓90%+</td></tr>
-          <tr><td>查询退款-解决率</td><td>53%</td><td><span class="tag tag-g">70%+</span></td><td>+17pp</td></tr>
-          <tr><td>查询退款-失联率</td><td>20%</td><td><span class="tag tag-g"><7%</span></td><td>↓13pp</td></tr>
-          <tr><td>催促售后-解决率</td><td>46%</td><td><span class="tag tag-g">60%+</span></td><td>+14pp</td></tr>
-          <tr><td>极速退款-失联率</td><td>45%</td><td><span class="tag tag-g"><20%</span></td><td>↓25pp</td></tr>
-          <tr><td>整体和解率</td><td>61%</td><td><span class="tag tag-g">75%+</span></td><td>+14pp</td></tr>
-          <tr><td>日处理量</td><td>30-40</td><td><span class="tag tag-g">60-80</span></td><td>翻倍</td></tr>
+          <tr><th>指标</th><th>当前</th><th>目标</th><th>提升</th><th>依据</th></tr>
+          <tr><td>单均非沟通耗时</td><td>10min</td><td><span class="tag tag-g"><1min</span></td><td>↓90%+</td><td>步骤1/4/5被AI接管</td></tr>
+          <tr><td>查询退款-解决率</td><td>53%</td><td><span class="tag tag-g">70%+</span></td><td>+17%</td><td>复杂度判断挽救漏转工单</td></tr>
+          <tr><td>查询退款-失联率</td><td>20%</td><td><span class="tag tag-g"><7%</span></td><td>↓13pp</td><td>复杂场景直接转人工</td></tr>
+          <tr><td>催促售后-解决率</td><td>46%</td><td><span class="tag tag-g">60%+</span></td><td>+14%</td><td>转人工阈值降低+3B专有条件</td></tr>
+          <tr><td>催促售后-失联率</td><td>32%</td><td><span class="tag tag-g"><15%</span></td><td>↓17pp</td><td>减少规则解释占比+兜底方案</td></tr>
+          <tr><td>极速退款-失联率</td><td>45%</td><td><span class="tag tag-g"><20%</span></td><td>↓25pp</td><td>回款判断前置+跳过派单</td></tr>
+          <tr><td>整体和解率</td><td>61%</td><td><span class="tag tag-g">75%+</span></td><td>+14pp</td><td>场景分层+金额判断+多笔识别</td></tr>
+          <tr><td>日处理量</td><td>30-40单</td><td><span class="tag tag-g">60-80单</span></td><td>翻倍</td><td>释放67%非沟通时间</td></tr>
         </table>
       </div>
     </div>
@@ -969,7 +974,7 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
 </div>
 
 <div style="position:fixed;bottom:12px;left:12px;font-size:11px;color:#484f5866;z-index:100;pointer-events:none">
-  E 编辑模式 · S 演讲者视图 · T 切换主题 · ← → 翻页 · F 全屏 · O 总览
+  E 编辑 · ESC 保存退出 · S 演讲者 · T 主题 · ← → 翻页 · F 全屏 · O 总览
 </div>
 
 <script>
@@ -1487,7 +1492,7 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
   body.is-dragging-card * { user-select: none !important; }
   body.is-dragging-card iframe { pointer-events: none !important; }
 </style>
-<style>.edit-hint{display:none;position:fixed;top:8px;right:12px;background:#f5a524;color:#000;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;z-index:999;letter-spacing:.06em}</style>
+<style>.edit-hint{display:none;position:fixed;top:8px;right:12px;background:#f5a524;color:#000;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;z-index:999;letter-spacing:.06em}body.editing .notes{display:block!important;position:absolute;bottom:0;left:0;right:0;background:rgba(255,248,230,.95);border-top:2px dashed #f5a524;padding:12px 24px;font-size:14px;line-height:1.8;color:#333;z-index:50;max-height:28vh;overflow-y:auto}body.editing .notes p,body.editing .notes strong,body.editing .notes em{color:#333!important}body.editing .slide{padding-bottom:28vh!important}</style>
 </head>
 <body>
 
@@ -1911,7 +1916,7 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
       if (e.metaKey||e.ctrlKey||e.altKey) return;
       switch (e.key) {
         case 'ArrowRight': case ' ': case 'PageDown': case 'Enter': go(idx+1); e.preventDefault(); break;
-        case 'ArrowLeft': case 'PageUp': case 'Backspace': go(idx-1); e.preventDefault(); break;
+        case 'ArrowLeft': case 'PageUp': case 'Backspace': if (window.__editorActive) return; go(idx-1); e.preventDefault(); break;
         case 'Home': go(0); break;
         case 'End': go(total-1); break;
         case 'f': case 'F': fullscreen(); break;
@@ -1939,32 +1944,50 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
 
 <script>
 (function(){
+  var STORAGE_KEY = 'ppt-data-' + (location.pathname.replace(/[^a-zA-Z0-9]/g,'_') || 'default');
+
+  // ── Auto-restore saved content on load ──
+  try {
+    var saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      document.open();
+      document.write(saved);
+      document.close();
+    }
+  } catch(e) {}
+
+  // ── Editing mode: E to enter, ESC to save+exit ──
   window.__editorActive = false;
+
   document.addEventListener('keydown', function(e){
-    // E toggles editing mode
+    // E: enter editing mode
     if ((e.key === 'e' || e.key === 'E') && !e.metaKey && !e.ctrlKey && !e.altKey) {
-      window.__editorActive = !window.__editorActive;
-      document.body.style.outline = window.__editorActive ? '3px solid #f5a524' : '';
-      // Update hint
-      var hint = document.querySelector('.edit-hint');
-      if (hint) hint.style.display = window.__editorActive ? '' : 'none';
+      window.__editorActive = true;
+      document.body.contentEditable = 'true';
+      document.body.classList.add('editing');
       e.preventDefault();
       e.stopPropagation();
       e.stopImmediatePropagation();
       return;
     }
-    // When editing, only block keys that interfere with text editing.
-    // S/N/F/O/T/A are left unblocked so user can access speaker notes etc.
-    if (window.__editorActive) {
-      var k = e.key;
-      if (k === 'ArrowRight' || k === 'ArrowLeft' || k === 'ArrowUp' || k === 'ArrowDown' || k === ' ' || k === 'PageDown' || k === 'PageUp' || k === 'Backspace' || k === 'Delete' || k === 'Enter' || k === 'Home' || k === 'End') {
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-      }
+
+    // ESC: save + exit editing mode
+    if (e.key === 'Escape' && window.__editorActive) {
+      window.__editorActive = false;
+      document.body.contentEditable = 'false';
+      document.body.classList.remove('editing');
+      try {
+        localStorage.setItem(STORAGE_KEY, document.documentElement.outerHTML);
+      } catch(err) {}
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return;
     }
-  }, true); // capture phase — fires BEFORE runtime.js bubble listener
+  }, true);
 })();
 </script>
+<!-- editor-patch-marker -->
 
 </body>
 </html>
