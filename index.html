@@ -1953,10 +1953,11 @@ h1.title,h2.title,.h1,.h2{font-weight:700;color:var(--accent)}
       e.stopImmediatePropagation();
       return;
     }
-    // When editing, block all navigation keys
+    // When editing, only block keys that interfere with text editing.
+    // S/N/F/O/T/A are left unblocked so user can access speaker notes etc.
     if (window.__editorActive) {
       var k = e.key;
-      if (k === 'ArrowRight' || k === 'ArrowLeft' || k === ' ' || k === 'PageDown' || k === 'PageUp' || k === 'Backspace' || k === 'Enter' || k === 'Home' || k === 'End' || k === 'f' || k === 'F' || k === 's' || k === 'S' || k === 'n' || k === 'N' || k === 'o' || k === 'O' || k === 't' || k === 'T' || k === 'a' || k === 'A') {
+      if (k === 'ArrowRight' || k === 'ArrowLeft' || k === 'ArrowUp' || k === 'ArrowDown' || k === ' ' || k === 'PageDown' || k === 'PageUp' || k === 'Backspace' || k === 'Delete' || k === 'Enter' || k === 'Home' || k === 'End') {
         e.stopPropagation();
         e.stopImmediatePropagation();
       }
