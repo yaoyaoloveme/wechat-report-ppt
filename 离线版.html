@@ -1,659 +1,1019 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-themes="particle-cyber,corporate-clean,minimal-white,arctic-cool,academic-paper">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能汇报文档 - 二线外呼全链路智能优化</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background-color: #0f172a; color: #f8fafc; overflow: hidden; }
-        .slide { display: none; height: 100vh; width: 100vw; padding: 2rem 4rem 6.5rem 4rem; animation: fadeIn 0.5s ease-in-out; }
-        .slide.active { display: flex; flex-direction: column; }
-        .slide > div:first-child:not(.flex-1) { margin-bottom: 1.5rem !important; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
-        .gradient-text { background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; color: transparent; }
-        
-        /* Navigation Controls */
-        .nav-btn { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); border-radius: 50%; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.3s; z-index: 50; border: 1px solid rgba(255,255,255,0.2); }
-        .nav-btn:hover { background: rgba(255,255,255,0.2); box-shadow: 0 0 15px rgba(56, 189, 248, 0.5); }
-        .prev-btn { left: 20px; }
-        .next-btn { right: 20px; }
-        .page-indicator { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 0.875rem; color: #94a3b8; letter-spacing: 2px; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>微信小店客服外呼工单智能化改造汇报方案 · 粒子特效版</title>
+<style>
+/* ============ CSS RESET & BASE ============ */
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#060b1a;color:#e8ebf4;
+  font-family:'Inter','Noto Sans SC',-apple-system,BlinkMacSystemFont,sans-serif;
+  font-weight:400;line-height:1.6;-webkit-font-smoothing:antialiased;
+  letter-spacing:-.01em;overflow:hidden;height:100vh}
+
+/* ============ PARTICLE CANVAS BG ============ */
+#particle-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ============ SLIDE SYSTEM ============ */
+.deck{position:relative;width:100vw;height:100vh;overflow:hidden;z-index:1}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:56px 80px;box-sizing:border-box;
+  opacity:0;pointer-events:none;
+  transition:opacity .5s cubic-bezier(.4,0,.2,1),transform .5s cubic-bezier(.4,0,.2,1);
+  transform:translateX(30px);overflow:hidden;
+}
+.slide.is-active{opacity:1;pointer-events:auto;transform:translateX(0);z-index:2}
+.slide.is-prev{transform:translateX(-30px)}
+.slide.cover{padding:80px 96px;display:flex;flex-direction:column;justify-content:center}
+.slide.thanks{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.slide.tight{padding:36px 64px}
+
+/* ============ TYPOGRAPHY ============ */
+.kicker{font-family:'JetBrains Mono','IBM Plex Mono',monospace;font-size:12px;color:#8287a8;
+  letter-spacing:.12em;text-transform:uppercase;margin:0 0 14px}
+.h1{font-size:clamp(36px,4.5vw,60px);line-height:1.12;letter-spacing:-.02em;margin:0 0 20px;font-weight:800;color:#f2f4ff}
+.h2{font-size:clamp(26px,2.8vw,40px);line-height:1.22;letter-spacing:-.01em;margin:0 0 20px;font-weight:700;color:#f2f4ff}
+.h3{font-size:20px;color:#f2f4ff;margin:0 0 10px;font-weight:700}
+.lede{font-size:17px;line-height:1.55;color:#c3c8e6;max-width:62ch}
+.accent{color:#22d3ee;font-weight:700}
+.accent2{color:#a855f7;font-weight:700}
+.mono{font-family:'JetBrains Mono','IBM Plex Mono',monospace;font-size:.88em;
+  padding:2px 7px;border-radius:5px;background:rgba(255,255,255,.06);color:#22d3ee}
+.fz-sm{font-size:14px}.fz-xs{font-size:12px}
+.tc{text-align:center}.tl{text-align:left}.tr{text-align:right}
+.mt-s{margin-top:10px}.mt-m{margin-top:18px}.mt-l{margin-top:28px}
+.mb-s{margin-bottom:8px}.mb-m{margin-bottom:18px}.mb-l{margin-bottom:28px}
+
+/* ============ CARDS (GLASS) ============ */
+.card{
+  background:rgba(255,255,255,.05);backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border:1px solid rgba(255,255,255,.12);border-radius:18px;
+  padding:20px 24px;position:relative;overflow:hidden;
+  box-shadow:0 8px 32px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.card h4{margin:0 0 8px;font-size:17px;color:#f2f4ff}
+.card p{font-size:13px;line-height:1.6;color:#c3c8e6;margin:0}
+.card.accent-top{border-top:3px solid #22d3ee}
+.card.good-top{border-top:3px solid #4ade80}
+.card.bad-top{border-top:3px solid #f87171}
+.card.purple-left{border-left:3px solid #a855f7}
+.card.orange-top{border-top:3px solid #f59e0b}
+.card.green-top{border-top:3px solid #4ade80}
+.card.red-top{border-top:3px solid #f87171}
+
+/* ============ DATA TABLES (GLASS) ============ */
+.data-table{
+  width:100%;border-collapse:collapse;margin:10px 0;font-size:13px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.03);border-radius:12px;overflow:hidden;
+}
+.data-table th{
+  background:rgba(255,255,255,.08);padding:8px 10px;text-align:left;
+  font-weight:700;color:#a5b4fc;border:1px solid rgba(255,255,255,.08);font-size:12px;
+}
+.data-table td{
+  padding:7px 10px;border:1px solid rgba(255,255,255,.06);color:#c3c8e6;line-height:1.4;
+}
+.data-table.small{font-size:11px}
+.data-table.small th,.data-table.small td{padding:5px 7px}
+.data-table.xsmall{font-size:10px}
+.data-table.xsmall th,.data-table.xsmall td{padding:4px 6px}
+
+/* ============ TAGS ============ */
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700;line-height:1.5}
+.tag-g{background:rgba(74,222,128,.2);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+.tag-r{background:rgba(248,113,113,.2);color:#f87171;border:1px solid rgba(248,113,113,.3)}
+.tag-y{background:rgba(250,204,21,.2);color:#facc15;border:1px solid rgba(250,204,21,.3)}
+.tag-b{background:rgba(96,165,250,.2);color:#60a5fa;border:1px solid rgba(96,165,250,.3)}
+.tag-p{background:rgba(168,85,247,.2);color:#a855f7;border:1px solid rgba(168,85,247,.3)}
+
+/* ============ INSIGHT BOXES ============ */
+.insight{
+  border-left:4px solid #22d3ee;padding:10px 16px;margin:10px 0;
+  border-radius:0 8px 8px 0;font-size:13px;color:#c3c8e6;
+  background:rgba(34,211,238,.08);
+}
+.insight strong{color:#f2f4ff}
+.insight.good{border-left-color:#4ade80;background:rgba(74,222,128,.08)}
+.insight.bad{border-left-color:#f87171;background:rgba(248,113,113,.08)}
+.insight.warn{border-left-color:#f59e0b;background:rgba(245,158,11,.08)}
+.insight.purple{border-left-color:#a855f7;background:rgba(168,85,247,.08)}
+
+/* ============ FLOW DIAGRAM ============ */
+.flow-wrap{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;
+  padding:16px;margin:10px 0;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;
+}
+.fn{padding:6px 12px;border-radius:6px;font-weight:700;font-size:11px;text-align:center;border:2px solid;white-space:nowrap}
+.fn-b{background:rgba(34,211,238,.15);border-color:#22d3ee;color:#22d3ee}
+.fn-g{background:rgba(74,222,128,.15);border-color:#4ade80;color:#4ade80}
+.fn-r{background:rgba(248,113,113,.15);border-color:#f87171;color:#f87171}
+.fn-y{background:rgba(250,204,21,.15);border-color:#facc15;color:#facc15}
+.fn-p{background:rgba(168,85,247,.15);border-color:#a855f7;color:#c084fc}
+.arw{font-size:16px;color:#8287a8;font-weight:700;margin:0 2px}
+
+/* ============ SCRIPT BOX ============ */
+.script-box{
+  background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);border-radius:10px;
+  padding:10px 16px;margin:8px 0;font-size:12px;line-height:1.7;
+}
+.script-box .label{font-weight:700;color:#4ade80;font-size:11px;margin-bottom:4px}
+.script-box b{color:#f2f4ff}
+.script-box p{color:#c3c8e6;margin:3px 0;font-size:12px}
+
+/* ============ VS COMPARISON ============ */
+.vs-box{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:10px 0}
+.vs-item{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:18px;
+}
+.vs-item h4{font-size:15px;margin:0 0 8px}
+.vs-item p{font-size:12px;line-height:1.7;color:#c3c8e6;margin:0}
+
+/* ============ GRID / LAYOUT ============ */
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.stack>*+*{margin-top:14px}
+.row{display:flex;gap:24px;align-items:center}
+.center{display:flex;align-items:center;justify-content:center;text-align:center}
+.fill{flex:1}
+
+/* ============ AGENDA ROWS ============ */
+.agenda-row{
+  display:flex;align-items:center;gap:16px;
+  padding:14px 20px;margin-bottom:8px;border-radius:10px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  transition:all .3s ease;
+}
+.agenda-row:hover{background:rgba(34,211,238,.08);border-color:rgba(34,211,238,.3);transform:translateX(4px)}
+.agenda-row .num{font-size:13px;font-weight:900;color:#22d3ee;min-width:28px}
+.agenda-row .t{flex:1;font-size:16px;font-weight:600;color:#f2f4ff}
+.agenda-row .d{font-size:12px;color:#8287a8}
+
+/* ============ SPEAKER ============ */
+.speaker{display:flex;align-items:center;gap:10px;margin-top:28px}
+.speaker .av{width:38px;height:38px;border-radius:50%;
+  background:linear-gradient(135deg,#22d3ee,#a855f7)}
+.speaker b{display:block;font-size:15px;color:#f2f4ff}
+.speaker span{font-size:12px;color:#8287a8}
+
+/* ============ CONCLUSION ============ */
+.conclusion-slide{
+  background:linear-gradient(135deg,rgba(34,211,238,.15),rgba(168,85,247,.15));
+  border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:28px 32px;margin:16px 0;
+}
+.conclusion-slide h2{color:#f2f4ff;margin-top:0}
+.conclusion-slide p{color:#c3c8e6;font-size:15px;line-height:1.8}
+.conclusion-slide strong{color:#f2f4ff}
+
+/* ============ COMPARE BAR ============ */
+.compare-bar-wrap{
+  display:flex;align-items:flex-end;gap:40px;justify-content:center;
+  margin:14px 0;padding:18px;
+  background:rgba(255,255,255,.04);border-radius:12px;border:1px solid rgba(255,255,255,.06);
+}
+.bar-group{text-align:center}
+.bar-group .bar{width:70px;border-radius:6px 6px 0 0;margin:0 auto;transition:height .5s}
+.bar-group .num{font-size:22px;font-weight:900;margin-top:6px;color:#f2f4ff}
+.bar-group .lbl{font-size:11px;color:#8287a8;margin-top:2px}
+
+/* ============ CHROME ============ */
+.deck-header{position:fixed;top:16px;left:32px;right:32px;display:flex;align-items:center;
+  justify-content:space-between;font-size:11px;color:#8287a8;letter-spacing:.1em;z-index:10;pointer-events:none}
+.deck-footer{position:fixed;bottom:16px;left:32px;right:32px;display:flex;align-items:center;
+  justify-content:space-between;font-size:11px;color:#8287a8;z-index:10;pointer-events:none}
+.progress-bar{position:fixed;left:0;right:0;bottom:0;height:3px;background:transparent;z-index:20}
+.progress-bar>span{display:block;height:100%;width:0;background:linear-gradient(90deg,#22d3ee,#a855f7);
+  transition:width .3s cubic-bezier(.4,0,.2,1);box-shadow:0 0 10px rgba(34,211,238,.5)}
+
+/* ============ NOTES ============ */
+.notes{display:none!important}
+.notes-overlay{position:fixed;inset:auto 0 0 0;max-height:42vh;
+  background:rgba(6,11,26,.96);color:#e8ebf4;padding:20px 32px;font-size:16px;line-height:1.6;
+  border-top:1px solid rgba(255,255,255,.1);transform:translateY(100%);
+  transition:transform .3s ease;z-index:40;overflow:auto;backdrop-filter:blur(12px)}
+.notes-overlay.open{transform:translateY(0)}
+
+/* ============ OVERVIEW ============ */
+.overview{position:fixed;inset:0;background:rgba(6,11,26,.94);backdrop-filter:blur(16px);z-index:50;
+  display:none;padding:40px;overflow:auto}
+.overview.open{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;align-content:start}
+.overview .thumb{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;
+  aspect-ratio:16/9;overflow:hidden;cursor:pointer;position:relative;padding:16px;
+  transition:transform .2s ease,box-shadow .2s ease
+}
+.overview .thumb:hover{transform:scale(1.04);box-shadow:0 8px 30px rgba(34,211,238,.2)}
+.overview .thumb .n{position:absolute;top:8px;left:10px;font-weight:700;font-size:14px;color:#22d3ee}
+.overview .thumb .t{position:absolute;bottom:10px;left:14px;right:14px;font-weight:600;color:#f2f4ff;font-size:12px}
+
+/* ============ ANIMATIONS ============ */
+@keyframes kf-fade-up{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:none}}
+@keyframes kf-rise{from{opacity:0;transform:translateY(60px) scale(.97);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+@keyframes kf-glow{0%,100%{text-shadow:0 0 8px #22d3ee,0 0 20px #22d3ee}50%{text-shadow:0 0 16px #22d3ee,0 0 40px #22d3ee,0 0 80px #a855f7}}
+.anim-fade-up{animation:kf-fade-up .7s cubic-bezier(.4,0,.2,1) both}
+.anim-rise-in{animation:kf-rise .9s cubic-bezier(.4,0,.2,1) both}
+.anim-glow{animation:kf-glow 3s ease-in-out infinite}
+
+/* stagger */
+.anim-stagger-list>*{opacity:0;animation:kf-rise .65s cubic-bezier(.4,0,.2,1) both}
+.anim-stagger-list>*:nth-child(1){animation-delay:.05s}
+.anim-stagger-list>*:nth-child(2){animation-delay:.15s}
+.anim-stagger-list>*:nth-child(3){animation-delay:.25s}
+.anim-stagger-list>*:nth-child(4){animation-delay:.35s}
+.anim-stagger-list>*:nth-child(5){animation-delay:.45s}
+.anim-stagger-list>*:nth-child(6){animation-delay:.55s}
+.anim-stagger-list>*:nth-child(7){animation-delay:.65s}
+.anim-stagger-list>*:nth-child(8){animation-delay:.75s}
+
+/* ============ EDIT MODE ============ */
+.edit-hint{display:none;position:fixed;top:8px;right:12px;
+  background:rgba(34,211,238,.9);color:#000;padding:4px 10px;border-radius:4px;
+  font-size:11px;font-weight:700;z-index:999;letter-spacing:.06em}
+body.editing .notes{display:block!important;position:absolute;bottom:0;left:0;right:0;
+  background:rgba(6,11,26,.96);border-top:2px dashed #22d3ee;padding:12px 24px;
+  font-size:14px;line-height:1.8;color:#e8ebf4;z-index:50;max-height:28vh;overflow-y:auto}
+body.editing .notes p,body.editing .notes strong,body.editing .notes em{color:#e8ebf4!important}
+body.editing .slide{padding-bottom:28vh!important}
+
+/* ============ KEY HINT ============ */
+.key-hint{font-size:11px;color:rgba(255,255,255,.2);margin-top:12px}
+
+@media print{
+  .slide{position:relative;opacity:1!important;transform:none!important;page-break-after:always;height:100vh}
+  .deck-header,.deck-footer,.progress-bar,.notes-overlay,.overview,#particle-canvas{display:none!important}
+}
+@media (prefers-reduced-motion:reduce){
+  [class*="anim-"]{animation:none!important;transition:none!important}
+}
+</style>
 </head>
 <body>
+<div class="edit-hint">✏️ 编辑中 · ESC 保存并退出</div>
+<canvas id="particle-canvas"></canvas>
+<div class="deck">
 
-    <!-- Slide 1: Cover -->
-    <div class="slide active" id="slide-1">
-        <div class="flex-1 flex flex-col items-center justify-center text-center">
-            <div class="inline-block px-4 py-1 rounded-full bg-blue-900/50 text-blue-300 border border-blue-500/30 mb-6 text-sm font-semibold tracking-widest">
-                智能汇报文档
-            </div>
-            <h1 class="text-6xl font-extrabold mb-6 tracking-tight">
-                二线外呼全链路 <span class="gradient-text">智能优化方案</span>
-            </h1>
-            <p class="text-2xl text-slate-400 mb-12 max-w-3xl leading-relaxed">
-                针对接通率瓶颈与人工耗时痛点，构建“预约-派单-推荐-外呼-操作-归档”的六步智能化闭环。
-            </p>
-            <div class="flex space-x-4">
-                <div class="px-6 py-3 glass-card flex items-center space-x-3">
-                    <i class="fa-solid fa-phone-volume text-cyan-400"></i>
-                    <span>接通率提升突破</span>
-                </div>
-                <div class="px-6 py-3 glass-card flex items-center space-x-3">
-                    <i class="fa-solid fa-microchip text-indigo-400"></i>
-                    <span>人机协同提效</span>
-                </div>
-                <div class="px-6 py-3 glass-card flex items-center space-x-3">
-                    <i class="fa-solid fa-bolt text-yellow-400"></i>
-                    <span>自动化闭环归档</span>
-                </div>
-            </div>
-        </div>
+  <!-- ═══════════ 1. COVER ═══════════ -->
+  <section class="slide cover" data-title="封面" contenteditable="false">
+    <p class="kicker">// 微信小店 · 二线客服 · 智能化项目组</p>
+    <h1 class="h1 anim-glow" style="background:linear-gradient(135deg,#22d3ee,#a855f7 55%,#c084fc);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent">客服外呼工单<span style="color:#22d3ee;-webkit-text-fill-color:#22d3ee">智能化改造</span>汇报方案</h1>
+    <p class="lede mt-m">衣帽箱包行业试点 · 数据验证与场景落地 · V5.0 · 2026年5月</p>
+    <div class="speaker">
+      <div class="av"></div>
+      <div><b>微信小店客服二线</b><span>智能化项目组 · ~25 min</span></div>
     </div>
+    <p class="key-hint">按 <span class="mono">S</span> 演讲者视图 · <span class="mono">T</span> 换主题 · <span class="mono">← →</span> 翻页 · <span class="mono">E</span> 编辑</p>
+    <aside class="notes">
+      <p>各位领导，下午好。我是微信小店客服二线智能化项目组的成员。今天代表项目组向各位汇报的核心议题是——<strong>客服外呼工单的智能化改造方案</strong>。</p>
+      <p>本方案并非理论推演，而是基于<strong>241条真实工单数据</strong>，经逐条验证后得出的实践结论。我们选取衣帽箱包行业作为试点，设计了一套从智能预约到智能归档的全链路六步闭环体系。</p>
+      <p>汇报时长约25分钟，共分为六个部分：第一部分阐明项目背景与智能化改造的必要性；第二部分论证试点行业的选择逻辑；第三部分详细阐述六步闭环方案的设计细节，这是本次汇报的核心内容；第四部分展示241条数据的验证结论；第五部分量化目标预估；第六部分以R1至R18十八条标签规则总表收束全文。</p>
+      <p>核心结论可概括为：<strong>外呼工单处理链路中，67%的耗时消耗在无需人类判断力的机械操作环节，可由AI系统完全接管</strong>。人力不应被消耗在重复性操作之上。接下来，请允许我开始正式的汇报。</p>
+    </aside>
+  </section>
 
-    <!-- Slide 2: Background - Structure -->
-    <div class="slide" id="slide-2">
-        <div class="mb-8">
-            <h2 class="text-3xl font-bold mb-2">一、为什么做行业智能化？</h2>
-            <p class="text-slate-400">痛点剖析：工单结构拆解与人力消耗分布</p>
-        </div>
-        <div class="flex-1 flex items-center justify-center">
-            <div class="w-full max-w-5xl glass-card p-10 flex flex-col relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
-                
-                <div class="text-center mb-10 relative z-10">
-                    <div class="text-xl text-slate-300 mb-2">日均升级总工单量</div>
-                    <div class="text-6xl font-bold text-white tracking-wider">5,500 <span class="text-2xl text-slate-400 font-normal">单</span></div>
-                </div>
-
-                <div class="flex justify-between items-stretch gap-8 relative z-10">
-                    <div class="flex-1 bg-slate-800/80 rounded-xl p-8 border-t-4 border-cyan-500 relative">
-                        <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
-                            核心提效战场
-                        </div>
-                        <h3 class="text-2xl font-bold mb-4 text-center">需外呼处理工单</h3>
-                        <div class="text-5xl font-black text-cyan-400 text-center mb-6">4,300 <span class="text-xl font-normal text-slate-300">单</span></div>
-                        <div class="bg-slate-900 rounded-lg p-4 flex items-center justify-between">
-                            <span class="text-slate-400"><i class="fa-solid fa-users mr-2"></i>日均人力需求</span>
-                            <span class="text-2xl font-bold text-red-400">122 人</span>
-                        </div>
-                        <p class="text-sm text-slate-500 mt-4 text-center">耗费绝大部分人力，急需智能化改造介入</p>
-                    </div>
-
-                    <div class="w-12 flex items-center justify-center">
-                        <div class="w-0.5 h-full bg-slate-700"></div>
-                    </div>
-
-                    <div class="flex-1 bg-slate-800/80 rounded-xl p-8 border-t-4 border-emerald-500">
-                        <h3 class="text-2xl font-bold mb-4 text-center">可快速赔付工单</h3>
-                        <div class="text-5xl font-black text-emerald-400 text-center mb-6">1,200 <span class="text-xl font-normal text-slate-300">单</span></div>
-                        <div class="bg-slate-900 rounded-lg p-4 flex items-center justify-between">
-                            <span class="text-slate-400"><i class="fa-solid fa-user-check mr-2"></i>日均人力需求</span>
-                            <span class="text-2xl font-bold text-emerald-300">15 人</span>
-                        </div>
-                        <p class="text-sm text-slate-500 mt-4 text-center">流程简单短平快，无需重度介入</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- ═══════════ 2. AGENDA ═══════════ -->
+  <section class="slide" data-title="目录" contenteditable="false">
+    <p class="kicker">// agenda</p>
+    <h2 class="h2">汇报<span class="accent">六个部分</span></h2>
+    <div class="stack mt-l">
+      <div class="agenda-row"><span class="num">01</span><span class="t">项目背景与智能化必要性</span><span class="d">~3min</span></div>
+      <div class="agenda-row"><span class="num">02</span><span class="t">试点行业选择——为何选择衣帽箱包</span><span class="d">~2min</span></div>
+      <div class="agenda-row"><span class="num">03</span><span class="t">全链路六步智能化闭环方案</span><span class="d">~8min</span></div>
+      <div class="agenda-row"><span class="num">04</span><span class="t">241条数据验证结论</span><span class="d">~5min</span></div>
+      <div class="agenda-row"><span class="num">05</span><span class="t">目标达成与量化预估</span><span class="d">~3min</span></div>
+      <div class="agenda-row"><span class="num">06</span><span class="t">R1-R18规则总表与总结</span><span class="d">~3min</span></div>
     </div>
+    <aside class="notes">
+      <p>今日汇报共六个部分。第一部分阐述项目背景，即智能化改造的必要性。第二部分解释为何选择衣帽箱包行业作为试点。第三部分是核心——六步闭环方案中每一步的具体设计与逻辑。第四、第五部分以数据为支撑，展示241条工单逐条验证的成果。最后以十八条规则收束全文。</p>
+      <p>首先进入第一部分，项目背景。</p>
+    </aside>
+  </section>
 
-    <!-- Slide 3: Background - Time Breakdown -->
-    <div class="slide" id="slide-3">
-        <div class="mb-8">
-            <h2 class="text-3xl font-bold mb-2">一、为什么做行业智能化？</h2>
-            <p class="text-slate-400">耗时拆解：外呼以外的沉没成本</p>
+  <!-- ═══════════ 3. 项目背景 ═══════════ -->
+  <section class="slide tight" data-title="项目背景" contenteditable="false">
+    <p class="kicker">// part 01 · 背景分析</p>
+    <h2 class="h2">1.1 人力结构与耗时拆解</h2>
+    <div class="grid g2 mt-s">
+      <div>
+        <div class="card accent-top">
+          <h4>人力结构</h4>
+          <p>日均升级工单 <strong style="font-size:24px;color:#22d3ee">5,500</strong> 单<br>
+          外呼工单 4,300单（78.2%），人力122人<br>
+          快速赔付 1,200单（21.8%），人力15人</p>
         </div>
-        <div class="flex-1 flex flex-col justify-center items-center">
-            <div class="w-full max-w-5xl glass-card p-8 mb-6">
-                <h3 class="text-xl font-bold mb-6 text-center">人工处理单均总耗时：<span class="text-4xl text-yellow-400 ml-2">12 分钟</span></h3>
-                
-                <div class="flex w-full h-16 rounded-full overflow-hidden mb-6 shadow-lg shadow-black/50">
-                    <div class="bg-blue-600 flex items-center justify-center text-sm font-bold w-[25%]" title="查询信息 3min">
-                        查询信息 (3m)
-                    </div>
-                    <div class="bg-emerald-500 flex items-center justify-center text-sm font-bold w-[42%]" title="外呼沟通 5min">
-                        <i class="fa-solid fa-phone mr-2"></i> 外呼沟通 (5m)
-                    </div>
-                    <div class="bg-purple-600 flex items-center justify-center text-sm font-bold w-[8%]" title="执行操作 1min">
-                        操作(1m)
-                    </div>
-                    <div class="bg-orange-500 flex items-center justify-center text-sm font-bold w-[25%]" title="归档备注 3min">
-                        归档备注 (3m)
-                    </div>
-                </div>
-
-                <div class="flex justify-between px-4 text-sm text-slate-400">
-                    <div class="text-left w-[25%]">① 阅览历史工单与标签</div>
-                    <div class="text-center w-[42%] text-white font-bold">② 核心交互环节</div>
-                    <div class="text-center w-[8%]">③ 赔付/砍单</div>
-                    <div class="text-right w-[25%]">④ 写备注与结单</div>
-                </div>
-            </div>
-
-            <div class="flex w-full max-w-5xl gap-6">
-                <div class="glass-card p-6 flex-1 border-l-4 border-red-500">
-                    <div class="text-red-400 text-lg font-bold mb-2"><i class="fa-solid fa-triangle-exclamation mr-2"></i>核心痛点发现</div>
-                    <p class="text-slate-300 leading-relaxed text-lg">
-                        在12分钟的链路中，除外呼本身的5分钟外，<strong class="text-white">查询(3m) + 操作(1m) + 归档(3m) 合计花费 7 分钟</strong>。
-                    </p>
-                </div>
-                <div class="glass-card p-6 flex-1 bg-gradient-to-r from-blue-900/50 to-indigo-900/50 border-none">
-                    <div class="text-cyan-400 text-lg font-bold mb-2"><i class="fa-solid fa-lightbulb mr-2"></i>破局思路</div>
-                    <p class="text-slate-300 leading-relaxed text-lg">
-                        非沟通耗时占比高达 <strong class="text-3xl text-white ml-1">60%</strong>。这正是<span class="text-cyan-300 mx-1">系统自动化</span>与<span class="text-indigo-300 mx-1">AI智能化</span>最容易切入并产生巨大提效的环节。
-                    </p>
-                </div>
-            </div>
+      </div>
+      <div>
+        <div class="card good-top">
+          <h4>单均耗时：15分钟</h4>
+          <p>信息检索3min · 派单1min · 外呼5min<br>执行操作3min · 归档备注3min</p>
         </div>
+      </div>
     </div>
-
-    <!-- Slide 4: Industry Selection -->
-    <div class="slide" id="slide-4">
-        <div class="mb-6">
-            <h2 class="text-3xl font-bold mb-2">二、试点行业选型推导</h2>
-            <p class="text-slate-400">多维评估：寻找最佳智能化试验田</p>
-        </div>
-        <div class="flex-1 flex flex-col justify-center">
-            <div class="glass-card overflow-hidden">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-800 text-slate-300 text-sm uppercase tracking-wider">
-                            <th class="p-4 border-b border-slate-700">行业</th>
-                            <th class="p-4 border-b border-slate-700">日均升级量</th>
-                            <th class="p-4 border-b border-slate-700">和解率</th>
-                            <th class="p-4 border-b border-slate-700">平均通话时长</th>
-                            <th class="p-4 border-b border-slate-700">金额占比</th>
-                            <th class="p-4 border-b border-slate-700">难度评级</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-slate-200">
-                        <tr class="bg-emerald-900/40 border-l-4 border-emerald-500 shadow-inner">
-                            <td class="p-4 border-b border-slate-700 font-bold text-emerald-300"><i class="fa-solid fa-shirt mr-2"></i>衣帽箱包</td>
-                            <td class="p-4 border-b border-slate-700 font-bold">1,560</td>
-                            <td class="p-4 border-b border-slate-700 font-bold">84%</td>
-                            <td class="p-4 border-b border-slate-700 font-bold text-emerald-300">228s</td>
-                            <td class="p-4 border-b border-slate-700 font-bold">8.7%</td>
-                            <td class="p-4 border-b border-slate-700 font-bold text-emerald-400">易</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4 border-b border-slate-800">食品生鲜</td>
-                            <td class="p-4 border-b border-slate-800">400</td>
-                            <td class="p-4 border-b border-slate-800 text-slate-500">-</td>
-                            <td class="p-4 border-b border-slate-800">230s</td>
-                            <td class="p-4 border-b border-slate-800 text-slate-500">-</td>
-                            <td class="p-4 border-b border-slate-800 text-emerald-400">易</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4 border-b border-slate-800">普通综合</td>
-                            <td class="p-4 border-b border-slate-800">409</td>
-                            <td class="p-4 border-b border-slate-800 text-slate-500">-</td>
-                            <td class="p-4 border-b border-slate-800 text-red-300">260s</td>
-                            <td class="p-4 border-b border-slate-800 text-slate-500">-</td>
-                            <td class="p-4 border-b border-slate-800 text-red-400">难</td>
-                        </tr>
-                        <tr class="bg-slate-800/50">
-                            <td class="p-4 border-b border-slate-800">3C数码</td>
-                            <td class="p-4 border-b border-slate-800">121</td>
-                            <td class="p-4 border-b border-slate-800 text-slate-500">-</td>
-                            <td class="p-4 border-b border-slate-800 text-red-300">257s</td>
-                            <td class="p-4 border-b border-slate-800 text-slate-500">-</td>
-                            <td class="p-4 border-b border-slate-800 text-red-400">难</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4 border-b border-slate-800">珠宝文玩</td>
-                            <td class="p-4 border-b border-slate-800">51</td>
-                            <td class="p-4 border-b border-slate-800 text-slate-500">-</td>
-                            <td class="p-4 border-b border-slate-800 text-red-400">300s</td>
-                            <td class="p-4 border-b border-slate-800 text-slate-500">-</td>
-                            <td class="p-4 border-b border-slate-800 text-red-400">难</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="mt-6 flex items-center bg-cyan-900/30 p-4 rounded-lg border border-cyan-800">
-                <i class="fa-solid fa-bullseye text-3xl text-cyan-400 mr-4"></i>
-                <div>
-                    <h4 class="text-lg font-bold text-cyan-300">战略决策结论</h4>
-                    <p class="text-sm text-slate-300 mt-1">综合日升级量（覆盖面大）、和解率（成功率高）、通话时长（沟通成本低）等指标，最终选定 <strong class="text-white">衣帽箱包</strong> 行业作为智能化试点起点，具备极佳的示范效应。</p>
-                </div>
-            </div>
-        </div>
+    <table class="data-table mt-m">
+      <tr><th>步骤</th><th>操作内容</th><th>耗时</th><th>AI替代性</th><th>实现方式</th></tr>
+      <tr><td>1</td><td>查询工单信息（物流/售后/历史/商家）</td><td>3min</td><td><span class="tag tag-g">100%</span></td><td>RAG知识库</td></tr>
+      <tr><td>2</td><td>派单到商家</td><td>1min</td><td><span class="tag tag-g">80%</span></td><td>R1-R18规则匹配</td></tr>
+      <tr><td>3</td><td>外呼用户沟通</td><td>5min</td><td><span class="tag tag-y">简单场景可替</span></td><td>LLM语音Agent</td></tr>
+      <tr><td>4</td><td>执行操作（赔付/代发/砍单）</td><td>3min</td><td><span class="tag tag-g">100%</span></td><td>自动化引擎</td></tr>
+      <tr><td>5</td><td>归档备注</td><td>3min</td><td><span class="tag tag-g">100%</span></td><td>LLM自动摘要</td></tr>
+    </table>
+    <div class="insight good mt-s">
+      <strong>核心发现：</strong>步骤1、4、5合计10分钟（67%）消耗在规则明确、无需高级判断力的机械操作上——可由AI完全接管。
     </div>
+    <aside class="notes">
+      <p>首先审视当前运营现状。微信小店二线客服团队日均处理升级工单约5,500单，其中外呼工单4,300单，占比78.2%。此为本次改造的核心对象。</p>
+      <p>将每单处理链路拆解为五个步骤并精确计量各环节耗时后，数据呈现的结论十分明确：<strong>15分钟中，信息检索3分钟、派单1分钟、外呼5分钟、执行操作3分钟、归档备注3分钟</strong>。</p>
+      <p>关键洞察在于：步骤1（信息检索）、步骤4（执行操作）、步骤5（归档备注）合计10分钟，占比67%，这三步均无需人类判断力——查询物流状态、填写归档模板等操作，本质上并非"判断"而是"搬运"。因此，我们得出的核心结论是：<strong>这67%的耗时可由AI系统完全接管</strong>。这正是整个方案的逻辑起点。</p>
+    </aside>
+  </section>
 
-    <!-- Slide 5: Step 1 - Reservation -->
-    <div class="slide" id="slide-5">
-        <div class="mb-4 shrink-0">
-            <h2 class="text-3xl font-bold mb-2">第一步：智能预约</h2>
-            <p class="text-slate-400">破局 65% 接通率：从“盲呼”到“预约锁定”</p>
-        </div>
-        
-        <div class="flex-1 flex gap-8 items-center justify-center pb-8">
-            <!-- Left Panel -->
-            <div class="w-1/2 glass-card p-8 h-full flex flex-col justify-center relative overflow-hidden">
-                <div class="absolute top-0 right-0 bg-indigo-500 text-xs px-3 py-1 rounded-bl-lg font-bold">交互方案对比</div>
-                <h3 class="text-xl font-bold mb-6 text-white border-b border-slate-700 pb-2">预约模式选型</h3>
-                
-                <div class="space-y-6">
-                    <div class="opacity-50 grayscale transition-all duration-300">
-                        <div class="flex items-center mb-2">
-                            <span class="w-6 h-6 rounded-full bg-slate-600 flex items-center justify-center text-xs mr-3">A</span>
-                            <h4 class="font-bold text-lg">弹窗式 (IMC预设)</h4>
-                        </div>
-                        <p class="text-sm text-slate-400 pl-9">系统弹出时间选项卡供用户点选，较为被动。</p>
-                    </div>
-                    
-                    <div class="bg-indigo-900/40 p-5 rounded-lg border border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                        <div class="flex items-center mb-2">
-                            <span class="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs mr-3"><i class="fa-solid fa-check"></i></span>
-                            <h4 class="font-bold text-lg text-indigo-300">交互式 (人工/AI询问) —— <span class="text-white">当前选中方案</span></h4>
-                        </div>
-                        <p class="text-sm text-slate-300 pl-9 mb-3">通过对话交互自然询问，引导用户选择回访时间，体验更好且转化率更高。</p>
-                        <div class="pl-9 text-xs text-indigo-400 bg-black/20 p-2 rounded">
-                            <i class="fa-solid fa-comment-dots mr-2"></i> "先生您好，为了更好地帮您解决退款问题，请问今天下午3点还是晚上8点方便我们专员给您回电呢？"
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Panel -->
-            <div class="w-1/2 glass-card p-8 h-full flex flex-col justify-center">
-                <h3 class="text-xl font-bold mb-6 text-white flex items-center border-b border-slate-700 pb-2">
-                    <i class="fa-regular fa-calendar-check text-cyan-400 mr-3"></i> 当日各时段预约看板 (Mockup)
-                </h3>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="col-span-2 text-sm font-bold text-slate-400 mt-2">早盘时段</div>
-                    <div class="bg-slate-800 rounded p-3 flex justify-between items-center border-l-4 border-slate-600">
-                        <span class="text-slate-300">09:00 - 11:00</span>
-                        <span class="bg-slate-700 px-2 py-1 rounded text-xs">剩余: 12</span>
-                    </div>
-                    <div class="bg-slate-800 rounded p-3 flex justify-between items-center border-l-4 border-slate-600">
-                        <span class="text-slate-300">11:00 - 13:00</span>
-                        <span class="bg-slate-700 px-2 py-1 rounded text-xs">剩余: 5</span>
-                    </div>
-
-                    <div class="col-span-2 text-sm font-bold text-slate-400 mt-2">午盘时段</div>
-                    <div class="bg-slate-800 rounded p-3 flex justify-between items-center border-l-4 border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
-                        <span class="text-cyan-300 font-bold">13:00 - 15:00</span>
-                        <span class="bg-cyan-900/80 text-cyan-300 px-2 py-1 rounded text-xs border border-cyan-700">剩余: 45</span>
-                    </div>
-                    <div class="bg-slate-800 rounded p-3 flex justify-between items-center border-l-4 border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
-                        <span class="text-cyan-300 font-bold">15:00 - 17:00</span>
-                        <span class="bg-cyan-900/80 text-cyan-300 px-2 py-1 rounded text-xs border border-cyan-700">剩余: 38</span>
-                    </div>
-                    <div class="bg-slate-800 rounded p-3 flex justify-between items-center border-l-4 border-slate-600">
-                        <span class="text-slate-300">17:00 - 19:00</span>
-                        <span class="bg-slate-700 px-2 py-1 rounded text-xs">剩余: 19</span>
-                    </div>
-
-                    <div class="col-span-2 text-sm font-bold text-slate-400 mt-2">晚盘时段</div>
-                    <div class="bg-slate-800 rounded p-3 flex justify-between items-center border-l-4 border-indigo-500 col-span-2 shadow-[0_0_10px_rgba(99,102,241,0.2)]">
-                        <span class="text-indigo-300 font-bold">19:00 - 22:00</span>
-                        <span class="bg-indigo-900/80 text-indigo-300 px-2 py-1 rounded text-xs border border-indigo-700">剩余: 86 (高并发区)</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- ═══════════ 4. AI能力边界 ═══════════ -->
+  <section class="slide" data-title="AI能力边界" contenteditable="false">
+    <p class="kicker">// part 01 · AI能力边界</p>
+    <h2 class="h2">1.2 AI能做什么，<span class="accent">不能做什么</span></h2>
+    <div class="vs-box mt-m">
+      <div class="vs-item">
+        <h4 style="color:#4ade80">AI可高效完成</h4>
+        <p>信息检索与结构化输出：物流、售后、商家信息——秒级完成，准确率接近100%<br><br>
+        规则匹配与判定：R1-R18标签规则、派单排除条件——逻辑恒定，零出错<br><br>
+        模板化文本生成：话术、短信通知、归档小结——格式统一，质量稳定<br><br>
+        多任务并行：可同时处理数百个工单的查询、推荐与归档</p>
+      </div>
+      <div class="vs-item">
+        <h4 style="color:#f87171">AI能力边界</h4>
+        <p>模糊场景判责："觉得不好用"——是客观质量问题还是主观感受？AI无法做质性判断<br><br>
+        情绪化谈判：用户表示向监管部门投诉——标准话术可能激化矛盾<br><br>
+        高金额风险决策：500元及以上订单，误判成本远超AI节省的人力成本<br><br>
+        多诉求交叉：单工单涉及退货、运费、投诉的复合诉求——线性推理难以覆盖</p>
+      </div>
     </div>
+    <p class="fz-sm mt-m"><strong>技术架构：</strong>规则引擎（零Token）+ RAG知识库（50条压缩规则）+ LLM推理引擎（仅复杂场景）。原则：<strong>能用规则不用RAG，能用RAG不用LLM——逐层降本。</strong></p>
+    <aside class="notes">
+      <p>坦诚面对AI能力的边界，是制定可行方案的前提。</p>
+      <p>左侧为AI的擅长领域。信息检索、规则匹配、模板文本、多任务并行——这些均属<strong>输入明确、输出标准化的任务</strong>。以物流状态查询为例，人工可能存在疏漏，而AI的准确率可接近100%。</p>
+      <p>右侧为AI的能力边界。模糊场景判责、情绪化谈判、高金额风险决策、多诉求交叉——这些均需<strong>人类的质性判断能力</strong>。例如，用户表示"这个包不好用"，究竟是客观质量问题还是主观感受？AI无法回答。又如500元以上订单，一次误判的代价可能超过系统一个月节省的人力成本。</p>
+      <p>因此，我们采用三层混合架构：能用规则引擎解决的不调用RAG，能用RAG解决的不调用大模型。此为逐层降本的策略。真正需要大模型推理能力的场景比例实则很小。</p>
+    </aside>
+  </section>
 
-    <!-- Slide 6: Step 2 - Dispatch -->
-    <div class="slide" id="slide-6">
-        <div class="mb-8 shrink-0">
-            <h2 class="text-3xl font-bold mb-2">第二步：智能派单</h2>
-            <p class="text-slate-400">紧密联动：将合适的时间、急迫的工单交给匹配的人</p>
-        </div>
-        
-        <div class="flex-1 flex items-center justify-center w-full">
-            <div class="w-full max-w-4xl bg-slate-800/80 rounded-2xl p-8 border border-slate-700 relative overflow-hidden shadow-2xl">
-                <div class="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
-                
-                <div class="flex flex-col md:flex-row items-center gap-10">
-                    <!-- Left Logic -->
-                    <div class="flex-1 space-y-6">
-                        <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-700 relative">
-                            <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center font-bold text-xs shadow-lg shadow-cyan-500/50">1</div>
-                            <h4 class="text-lg font-bold mb-2 text-cyan-300">动态承接能力评估</h4>
-                            <p class="text-sm text-slate-400">实时拉取各业务组在班人力与预估处理时效，结合前端【预约回访时段】单池，计算各个时段的人机吞吐量阈值。</p>
-                        </div>
-                        
-                        <div class="flex justify-center text-slate-500"><i class="fa-solid fa-arrow-down fa-lg"></i></div>
+  <!-- ═══════════ 5. 试点行业选择 ═══════════ -->
+  <section class="slide" data-title="试点行业选择" contenteditable="false">
+    <p class="kicker">// part 02 · 行业选择</p>
+    <h2 class="h2">2. 行业数据对比</h2>
+    <table class="data-table mt-m">
+      <tr><th>行业</th><th>日均升级量</th><th>和解率</th><th>平均通话</th><th>类目特征</th><th>适合度</th></tr>
+      <tr><td><strong style="color:#22d3ee">衣帽箱包</strong></td><td><strong style="color:#22d3ee">1,560</strong></td><td><strong style="color:#4ade80">84%</strong></td><td><strong>228s</strong></td><td>诉求明确（尺码/颜色/质量）</td><td><span class="tag tag-g">★★★★★ 首选</span></td></tr>
+      <tr><td>食品生鲜</td><td>400</td><td>-</td><td>230s</td><td>主观性强（保质期/感官）</td><td><span class="tag tag-y">★★★</span></td></tr>
+      <tr><td>普通综合</td><td>409</td><td>-</td><td>260s</td><td>需技术判断（功能/兼容性）</td><td><span class="tag tag-y">★★★</span></td></tr>
+      <tr><td>3C数码</td><td>121</td><td>-</td><td>257s</td><td>极高主观性（真假/价值评估）</td><td><span class="tag tag-r">不适合</span></td></tr>
+      <tr><td>珠宝文玩</td><td>51</td><td>-</td><td>300s</td><td>真假鉴定难（依赖专业机构）</td><td><span class="tag tag-r">不适合</span></td></tr>
+      <tr><td>虚拟产品</td><td>46</td><td>-</td><td>215s</td><td>课程/会员/充值类（举证困难）</td><td><span class="tag tag-r">不适合</span></td></tr>
+      <tr><td>美妆母婴</td><td>112</td><td>-</td><td>220s</td><td>过敏/不适（因果关系难界定）</td><td><span class="tag tag-r">不适合</span></td></tr>
+    </table>
+    <p class="fz-sm mt-m">衣帽箱包84%和解率居首。客诉以尺码不符、颜色差异、面料质量、物流时效为核心——诉求明确、判责标准清晰、用户期望可控。<strong>标准化的确定性越高，AI的能力边界越清晰，人机分工越明确。</strong></p>
+    <aside class="notes">
+      <p>试点行业的选择需以数据为依据。将七个主要行业的指标并列对比。</p>
+      <p>衣帽箱包日均升级量最大，达1,560单；和解率84%，居全行业之首。其客诉类型明确——尺码不符、颜色差异、面料质量、物流时效。<strong>诉求越明确，判责标准越清晰，AI介入的确定性就越高。</strong></p>
+      <p>反观珠宝文玩行业，日处理量仅51单但平均通话时长高达300秒——原因在于真假鉴定与价值评估超出了AI的认知能力。3C数码同理，功能兼容性问题需专业技术判断。</p>
+      <p><strong>选择衣帽箱包的核心逻辑为：标准化程度越高→AI能力边界越清晰→人机分工越可精确界定。</strong>这正是智能化改造所需的基础条件。</p>
+    </aside>
+  </section>
 
-                        <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-700 relative">
-                            <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center font-bold text-xs shadow-lg shadow-indigo-500/50">2</div>
-                            <h4 class="text-lg font-bold mb-2 text-indigo-300">四级工单漏斗路由</h4>
-                            <p class="text-sm text-slate-400">满足承接能力前提下，严格执行派单优先级排序，确保高危易发酵工单被优先秒级触达。</p>
-                        </div>
-                    </div>
-
-                    <!-- Right Funnel -->
-                    <div class="flex-1">
-                        <h4 class="text-center font-bold text-slate-300 mb-6 tracking-widest">派单优先级执行逻辑</h4>
-                        <div class="space-y-3 relative flex flex-col items-center">
-                            <div class="w-full bg-red-900/40 border border-red-500 text-red-400 py-3 rounded text-center font-bold shadow-[0_0_15px_rgba(239,68,68,0.2)]">
-                                级别 1：风控用户 (最高优)
-                            </div>
-                            <div class="w-11/12 bg-orange-900/40 border border-orange-500 text-orange-400 py-3 rounded text-center font-bold">
-                                级别 2：超时临期
-                            </div>
-                            <div class="w-10/12 bg-yellow-900/40 border border-yellow-500 text-yellow-400 py-3 rounded text-center font-bold">
-                                级别 3：多次催办
-                            </div>
-                            <div class="w-3/4 bg-slate-700 border border-slate-500 text-slate-300 py-3 rounded text-center font-bold">
-                                级别 4：普通工单
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- ═══════════ 6. 六步闭环总览 ═══════════ -->
+  <section class="slide" data-title="六步闭环总览" contenteditable="false">
+    <p class="kicker">// part 03 · 全链路方案</p>
+    <h2 class="h2">3. 全链路<span class="accent">六步智能化闭环</span></h2>
+    <div class="flow-wrap mt-l">
+      <div class="fn fn-b">1.智能预约</div><span class="arw">→</span>
+      <div class="fn fn-b">2.智能派单</div><span class="arw">→</span>
+      <div class="fn fn-b">3.智能推荐</div><span class="arw">→</span>
+      <div class="fn fn-p">4.智能外呼</div><span class="arw">→</span>
+      <div class="fn fn-b">5.智能操作</div><span class="arw">→</span>
+      <div class="fn fn-b">6.智能归档</div>
     </div>
-
-    <!-- Slide 7: Step 3 - Recommendation -->
-    <div class="slide" id="slide-7">
-        <div class="mb-4 shrink-0">
-            <h2 class="text-3xl font-bold mb-2">第三步：智能推荐</h2>
-            <p class="text-slate-400">将3分钟的手工查阅与思考，压缩至系统级1秒呈现</p>
-        </div>
-        
-        <div class="flex-1 flex justify-center items-center pb-6">
-            <div class="w-full max-w-3xl bg-slate-50 text-slate-800 rounded-lg shadow-2xl overflow-hidden border border-slate-300 font-sans transform hover:scale-[1.02] transition-transform">
-                <!-- Header -->
-                <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
-                    <div class="font-bold flex items-center"><i class="fa-solid fa-robot text-cyan-400 mr-2"></i>【AI 外呼准备单】</div>
-                    <div class="text-sm font-mono bg-slate-700 px-2 py-1 rounded">工单 #260000*******</div>
-                </div>
-                
-                <!-- Content -->
-                <div class="p-6">
-                    <!-- User Tags -->
-                    <div class="flex flex-wrap gap-2 mb-4 text-xs font-bold">
-                        <span class="bg-slate-200 px-2 py-1 rounded text-slate-700">先生/女士</span>
-                        <span class="bg-red-100 text-red-600 px-2 py-1 rounded border border-red-200">老年人/风控用户</span>
-                        <span class="bg-orange-100 text-orange-600 px-2 py-1 rounded">历史投诉: 1次(已解决)</span>
-                        <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded">历史赔付记录: 2次</span>
-                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded">历史判责: 2次(自营客责)</span>
-                    </div>
-
-                    <div class="mb-4 flex items-center bg-red-50 p-3 rounded-lg border border-red-100">
-                        <i class="fa-solid fa-heart-pulse text-red-500 mr-3 text-xl"></i>
-                        <div>
-                            <div class="text-xs text-slate-500 font-bold uppercase tracking-wider">实时情绪评估</div>
-                            <div class="font-bold text-red-700">低风险，但交互记录反复强调“失望”</div>
-                        </div>
-                    </div>
-
-                    <!-- Details Grid -->
-                    <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
-                        <div class="bg-slate-100 p-3 rounded border border-slate-200">
-                            <span class="text-slate-500 block text-xs mb-1">当前核心问题</span>
-                            <span class="font-bold text-slate-800">空气炸锅炸篮涂层脱落</span><br>
-                            <span class="text-xs text-slate-500">订单: 37097363832373 (购买90天)</span>
-                        </div>
-                        <div class="bg-slate-100 p-3 rounded border border-slate-200">
-                            <span class="text-slate-500 block text-xs mb-1">责任归属定性</span>
-                            <span class="font-bold text-slate-800">客责 (已知过售后期)</span>
-                        </div>
-                    </div>
-
-                    <!-- Solution & Rules -->
-                    <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-4">
-                        <div class="font-bold text-emerald-800 mb-2 flex items-center"><i class="fa-solid fa-lightbulb mr-2"></i>智能建议方案 (最高权限: 体验全额赔付)</div>
-                        <ol class="list-decimal list-inside text-sm text-emerald-700 space-y-1 font-medium">
-                            <li>优先尝试体验金赔付安抚</li>
-                            <li>若用户不接受，执行全额赔付最终方案</li>
-                        </ol>
-                    </div>
-
-                    <div class="border border-red-200 rounded-lg p-4 bg-white relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
-                        <div class="font-bold text-slate-800 mb-2 pl-2">⚠️ 实时话术红线拦截</div>
-                        <div class="text-sm space-y-2 pl-2">
-                            <div class="text-emerald-600 flex items-start"><i class="fa-solid fa-check mt-1 mr-2"></i> <span>可进行话术安抚，表达平台理解。</span></div>
-                            <div class="text-red-500 flex items-start font-bold"><i class="fa-solid fa-xmark mt-1 mr-2 text-lg"></i> <span>绝对禁止说：“这是规定”、“我不管商家”、“你自己去联系商家解决”。</span></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <p class="tc fz-sm" style="color:#8287a8">蓝色=AI全自动 &nbsp;|&nbsp; 紫色=AI+人工协同（核心决策环节）</p>
+    <div class="grid g3 mt-l">
+      <div class="card accent-top"><h4>智能预约</h4><p>AI Agent展示时段剩余量→用户选定→锁定→从源头消除无效外呼</p></div>
+      <div class="card accent-top"><h4>智能派单</h4><p>风控>超时>催办>普通。简单→机器队列，复杂→人工队列</p></div>
+      <div class="card accent-top"><h4>智能推荐</h4><p>赔付/代发/解释三类方案→匹配R1-R18→生成完整处理建议</p></div>
     </div>
-
-    <!-- Slide 8: Step 4 - Outbound (Reverted) -->
-    <div class="slide" id="slide-8">
-        <div class="mb-8 shrink-0">
-            <h2 class="text-3xl font-bold mb-2">第四步：外呼沟通</h2>
-            <p class="text-slate-400">人机分流：将标准交互交给AI，人工专注复杂沟通</p>
-        </div>
-        <div class="flex-1 flex gap-8 items-center justify-center">
-             <div class="w-1/2 glass-card p-8 border-t-4 border-cyan-500">
-                  <h3 class="text-2xl font-bold text-cyan-400 mb-4"><i class="fa-solid fa-robot mr-2"></i>智能外呼 (AI 试点)</h3>
-                  <p class="text-slate-300 mb-4">基于现有智能外呼能力（简单规则解释、基础按键交互），结合前置推送的服务方案，进行自动化沟通。</p>
-                  <div class="space-y-3">
-                      <div class="bg-slate-800 p-3 rounded border border-slate-600 flex items-center"><i class="fa-solid fa-magnifying-glass text-blue-400 w-8"></i> 查询退款进度</div>
-                      <div class="bg-slate-800 p-3 rounded border border-slate-600 flex items-center"><i class="fa-solid fa-stopwatch text-orange-400 w-8"></i> 催促售后进度</div>
-                      <div class="bg-slate-800 p-3 rounded border border-slate-600 flex items-center"><i class="fa-solid fa-bolt text-yellow-400 w-8"></i> 极速退款咨询</div>
-                  </div>
-             </div>
-             <div class="w-1/2 glass-card p-8 border-t-4 border-indigo-500">
-                  <h3 class="text-2xl font-bold text-indigo-400 mb-4"><i class="fa-solid fa-user-headset mr-2"></i>人工外呼 (兜底与升级)</h3>
-                  <p class="text-slate-300 mb-4">承接AI外呼中的异常跳转，以及复杂的高风险、高情绪用户诉求，提供有温度的安抚与灵活性处理。</p>
-                  <ul class="list-disc pl-5 text-slate-300 space-y-3 mt-6">
-                      <li>处理体验金/赔付谈判</li>
-                      <li>安抚多次投诉/风控预警用户</li>
-                      <li>处理客诉发酵风险工单</li>
-                  </ul>
-             </div>
-        </div>
+    <div class="grid g3 mt-s">
+      <div class="card purple-left"><h4>⭐ 智能外呼</h4><p>核心：预先判断该通电话是否适合AI执行。基于241条真实数据验证</p></div>
+      <div class="card accent-top"><h4>智能操作</h4><p>代发引擎/谈赔引擎/砍单引擎——外呼确认后自动执行，无需人工二次录入</p></div>
+      <div class="card accent-top"><h4>智能归档</h4><p>ASR转文字→LLM提取关键信息→结构化字段→自动打标，3分钟→10秒</p></div>
     </div>
+    <aside class="notes">
+      <p>接下来进入本次汇报的核心——六步闭环方案。</p>
+      <p>该方案的总体设计原则为：<strong>对链路中每一步评估"人类判断力占比"——判断力需求高的保留人工操作，占比低的移交机器处理。</strong></p>
+      <p>整体链路共六步：预约、派单、推荐、外呼、操作、归档。其中蓝色标注的为AI全自动步骤，紫色标注的外呼为AI与人工协同环节——此为整个方案的核心。</p>
+      <p>以下先快速概述各步骤的关键设计，随后重点展开第四步"智能外呼"，因其包含了241条数据验证的核心成果。</p>
+      <p>预约步骤的核心价值在于"从源头消除无效外呼"——用户在IMC中自主选择时段，AI负责管理容量与排队。派单步骤的优先级以风控为首——用户若已在第三方平台发起投诉，延迟处理的代价呈指数级增长。推荐步骤中，AI自动匹配R1至R18规则，生成判责结论、方案建议与标准话术。</p>
+    </aside>
+  </section>
 
-    <!-- Slide 9: Step 5 - Operation (Reverted) -->
-    <div class="slide" id="slide-9">
-        <div class="mb-8 shrink-0">
-            <h2 class="text-3xl font-bold mb-2">第五步：智能操作</h2>
-            <p class="text-slate-400">告别人工切换系统，方案确认即系统执行</p>
-        </div>
-        <div class="flex-1 flex flex-col items-center justify-center">
-            <div class="w-full max-w-4xl glass-card p-10 flex items-center justify-between relative">
-                <div class="w-1/3 text-center z-10">
-                    <div class="w-24 h-24 rounded-full bg-slate-800 border-4 border-cyan-500 flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(6,182,212,0.5)]">
-                        <i class="fa-solid fa-comments text-4xl text-cyan-400"></i>
-                    </div>
-                    <h4 class="font-bold text-lg text-white">交互确认方案</h4>
-                    <p class="text-sm text-slate-400 mt-2">通过外呼与用户交互<br>确认认可的最终诉求</p>
-                </div>
-                
-                <div class="flex-1 h-2 bg-slate-700 relative z-0">
-                    <div class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-emerald-500 animate-pulse"></div>
-                </div>
-
-                <div class="w-1/3 text-center z-10">
-                    <div class="w-24 h-24 rounded-full bg-slate-800 border-4 border-emerald-500 flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(16,185,129,0.5)]">
-                        <i class="fa-solid fa-gears text-4xl text-emerald-400"></i>
-                    </div>
-                    <h4 class="font-bold text-lg text-white">系统智能代操</h4>
-                    <p class="text-sm text-slate-400 mt-2">打通系统接口<br>实现智能操作直接归档</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-6 mt-10 w-full max-w-4xl">
-                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
-                    <i class="fa-solid fa-coins text-4xl text-yellow-500 mb-4"></i>
-                    <h4 class="font-bold text-white text-lg mb-1">体验金/赔付</h4>
-                </div>
-                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
-                    <i class="fa-solid fa-box text-4xl text-blue-500 mb-4"></i>
-                    <h4 class="font-bold text-white text-lg mb-1">工单代发</h4>
-                </div>
-                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
-                    <i class="fa-solid fa-scissors text-4xl text-red-500 mb-4"></i>
-                    <h4 class="font-bold text-white text-lg mb-1">强退/砍单</h4>
-                </div>
-            </div>
-        </div>
+  <!-- ═══════════ 7. 智能外呼核心 ═══════════ -->
+  <section class="slide tight" data-title="智能外呼理念" contenteditable="false">
+    <p class="kicker">// part 03 · 智能外呼 · 核心设计</p>
+    <h2 class="h2">3.4 智能外呼的<span class="accent">本质</span></h2>
+    <div class="insight purple mt-m">
+      <strong>智能外呼的本质不是"AI替代人工拨打电话"，而是"AI预先判断该通电话是否适合由AI执行"。</strong>该判断基于241条真实工单数据的逐条验证。
     </div>
-
-    <!-- Slide 10: Step 6 - Archiving (Reverted) -->
-    <div class="slide" id="slide-10">
-        <div class="mb-8 shrink-0">
-            <h2 class="text-3xl font-bold mb-2">第六步：智能归档</h2>
-            <p class="text-slate-400">彻底解放收尾工作，实现全链路无缝闭环</p>
-        </div>
-        <div class="flex-1 flex flex-col justify-center">
-            <div class="flex gap-4 items-center">
-                <div class="flex-1 glass-card p-6 border-t-4 border-indigo-500 text-center group">
-                    <div class="bg-indigo-900/50 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-ear-listen text-3xl text-indigo-400"></i>
-                    </div>
-                    <h3 class="font-bold text-lg text-white mb-2">链路提炼</h3>
-                    <p class="text-sm text-slate-400">总结工单处理全链路数据</p>
-                </div>
-                <div class="text-slate-600"><i class="fa-solid fa-chevron-right text-3xl"></i></div>
-                
-                <div class="flex-1 glass-card p-6 border-t-4 border-cyan-500 text-center group">
-                    <div class="bg-cyan-900/50 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-file-pen text-3xl text-cyan-400"></i>
-                    </div>
-                    <h3 class="font-bold text-lg text-white mb-2">生成备注</h3>
-                    <p class="text-sm text-slate-400">自动生成标准工单备注内容</p>
-                </div>
-                <div class="text-slate-600"><i class="fa-solid fa-chevron-right text-3xl"></i></div>
-                
-                <div class="flex-1 glass-card p-6 border-t-4 border-emerald-500 text-center group">
-                    <div class="bg-emerald-900/50 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-check-double text-3xl text-emerald-400"></i>
-                    </div>
-                    <h3 class="font-bold text-lg text-white mb-2">闭环归档</h3>
-                    <p class="text-sm text-slate-400">系统接管完成结单动作</p>
-                </div>
-            </div>
-        </div>
+    <p class="h3 mt-m">三场景数据对比</p>
+    <table class="data-table">
+      <tr><th>分析维度</th><th>查询退款进度（30条）</th><th>催促售后进度（28条）</th><th>极速退款（20条）</th></tr>
+      <tr><td><strong>核心特征变量</strong></td><td>是否属于复杂场景</td><td>是否复杂 + 商家合作态度</td><td>用户是否已收到回款</td></tr>
+      <tr><td>整体派单率</td><td>20%</td><td>21%</td><td>70%</td></tr>
+      <tr><td>整体解决率</td><td>53%</td><td>46%</td><td>40%</td></tr>
+      <tr><td>失联率</td><td>20%</td><td>32%</td><td><strong style="color:#f87171">45%</strong></td></tr>
+      <tr><td>复杂场景占比</td><td>37%</td><td>54%</td><td>N/A（回款占比65%）</td></tr>
+      <tr><td>最有效处理方案</td><td><span class="tag tag-g">代发100%</span></td><td><span class="tag tag-y">谈赔60%</span></td><td><span class="tag tag-g">谈赔100%</span></td></tr>
+      <tr><td>AI外呼预估覆盖率</td><td>≈63%</td><td>≈46%</td><td>≈35%</td></tr>
+    </table>
+    <div class="insight bad mt-s">
+      <strong>关键发现——极速退款的派单失效：</strong>已回款+派单组失联率高达50%。走谈赔路径的3条工单全部解决（100%）。结论：已回款+商家拒绝的工单应跳过派单，直接进入谈赔路径。
     </div>
+    <aside class="notes">
+      <p>智能外呼是整体方案的核心模块。首先需澄清一个常见误解：<strong>智能外呼并非"让AI代替人工拨打电话"，而是"预先判断某通电话是否适合由AI执行"。</strong></p>
+      <p>我们选取三个场景的真实数据——查询退款30条、催促售后28条、极速退款20条——从三个维度进行验证：派单率是否偏高、失联率是否偏高、何种处理方案最为有效。</p>
+      <p>数据结果极具启发性。极速退款场景最为令人警醒——派单率高达70%，但失联率同样高达45%。而已回款用户走派单路径的，50%均失联。原因在于：这部分用户已收到平台垫付的退款，其当前诉求并非"资金去向"，而是"能否再获一笔赔偿"。让其等待商家24小时方才回复，完全不符合其心理预期。</p>
+      <p>反之，走谈赔路径的3条工单全部成功解决。这说明：<strong>该场景下，派单本身即为错误策略，应直接进入谈赔路径</strong>。这就是数据验证的核心价值。</p>
+    </aside>
+  </section>
 
-    <!-- Slide 11: Target Achievement -->
-    <div class="slide" id="slide-11">
-        <div class="mb-8 shrink-0">
-            <h2 class="text-3xl font-bold mb-2">四、目标达成预估</h2>
-            <p class="text-slate-400">时效压缩与效能释放核算（单兵提效 118%）</p>
-        </div>
-        
-        <div class="flex-1 flex flex-col items-center justify-center w-full">
-            <!-- Table Matrix -->
-            <div class="w-full max-w-5xl glass-card overflow-hidden mb-4">
-                <table class="w-full text-left border-collapse text-sm">
-                    <thead>
-                        <tr class="bg-slate-800 text-slate-300 tracking-wider">
-                            <th class="p-3 border-b border-slate-700 w-1/5">链路环节</th>
-                            <th class="p-3 border-b border-slate-700 w-1/5">原耗时 (人工)</th>
-                            <th class="p-3 border-b border-slate-700 w-1/5 text-cyan-400">智能耗时</th>
-                            <th class="p-3 border-b border-slate-700 w-2/5 text-emerald-400">提效收益说明</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-slate-200">
-                        <tr class="hover:bg-slate-800/50">
-                            <td class="p-3 border-b border-slate-700 font-bold"><i class="fa-solid fa-network-wired text-indigo-400 mr-2"></i>派单流转</td>
-                            <td class="p-3 border-b border-slate-700">1 人专职手动</td>
-                            <td class="p-3 border-b border-slate-700 font-bold text-cyan-400">系统自动</td>
-                            <td class="p-3 border-b border-slate-700 text-emerald-300"><i class="fa-solid fa-arrow-trend-down mr-1"></i> 直接省去 1 个专职派单人力</td>
-                        </tr>
-                        <tr class="hover:bg-slate-800/50">
-                            <td class="p-3 border-b border-slate-700 font-bold"><i class="fa-solid fa-magnifying-glass text-blue-400 mr-2"></i>查询信息</td>
-                            <td class="p-3 border-b border-slate-700">3 分钟</td>
-                            <td class="p-3 border-b border-slate-700 font-bold text-cyan-400">10 秒</td>
-                            <td class="p-3 border-b border-slate-700 text-emerald-300"><i class="fa-solid fa-arrow-trend-down mr-1"></i> 系统秒级提取组装外呼准备单，省 2m50s</td>
-                        </tr>
-                        <tr class="bg-slate-800/30 hover:bg-slate-800/60">
-                            <td class="p-3 border-b border-slate-700 font-bold"><i class="fa-solid fa-headset text-purple-400 mr-2"></i>外呼沟通</td>
-                            <td class="p-3 border-b border-slate-700">5 分钟 (全量)</td>
-                            <td class="p-3 border-b border-slate-700 font-bold text-purple-300">简单0s/复杂5m</td>
-                            <td class="p-3 border-b border-slate-700 text-slate-300">查询进度等简单场景交由AI外呼，无需人工</td>
-                        </tr>
-                        <tr class="hover:bg-slate-800/50">
-                            <td class="p-3 border-b border-slate-700 font-bold"><i class="fa-solid fa-gears text-orange-400 mr-2"></i>执行操作</td>
-                            <td class="p-3 border-b border-slate-700">1 分钟</td>
-                            <td class="p-3 border-b border-slate-700 font-bold text-cyan-400">10 秒</td>
-                            <td class="p-3 border-b border-slate-700 text-emerald-300"><i class="fa-solid fa-arrow-trend-down mr-1"></i> API系统直连，自动代发/赔付，省 50s</td>
-                        </tr>
-                        <tr class="hover:bg-slate-800/50">
-                            <td class="p-3 border-b border-slate-700 font-bold"><i class="fa-solid fa-box-archive text-yellow-400 mr-2"></i>归档备注</td>
-                            <td class="p-3 border-b border-slate-700">3 分钟</td>
-                            <td class="p-3 border-b border-slate-700 font-bold text-cyan-400">10 秒</td>
-                            <td class="p-3 border-b border-slate-700 text-emerald-300"><i class="fa-solid fa-arrow-trend-down mr-1"></i> AI提炼一键结单，省 2m50s</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Big Number Cards -->
-            <div class="w-full max-w-5xl flex gap-6">
-                <div class="flex-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 p-6 rounded-xl relative overflow-hidden">
-                    <div class="absolute -right-4 -bottom-4 text-slate-700/50 text-6xl"><i class="fa-solid fa-stopwatch"></i></div>
-                    <div class="text-sm text-slate-400 font-bold mb-2">时效压缩底盘</div>
-                    <div class="text-3xl font-black text-white">12min <i class="fa-solid fa-arrow-right text-lg text-slate-500 mx-2"></i> 5.5min</div>
-                    <div class="mt-2 text-sm text-cyan-400">非沟通耗时从 7分钟 断崖降至 30秒</div>
-                </div>
-
-                <div class="flex-1 bg-gradient-to-br from-blue-900 to-indigo-900 border border-blue-700 p-6 rounded-xl relative overflow-hidden shadow-[0_0_20px_rgba(59,130,246,0.3)]">
-                    <div class="absolute -right-4 -bottom-4 text-blue-700/50 text-6xl"><i class="fa-solid fa-rocket"></i></div>
-                    <div class="text-sm text-blue-200 font-bold mb-2">单兵效能提升</div>
-                    <div class="text-4xl font-black text-white">+118%</div>
-                    <div class="mt-2 text-sm text-blue-300">单位时间内处理单量翻倍</div>
-                </div>
-
-                <div class="flex-1 bg-gradient-to-br from-emerald-900 to-teal-900 border border-emerald-700 p-6 rounded-xl relative overflow-hidden shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-                    <div class="absolute -right-4 -bottom-4 text-emerald-700/50 text-6xl"><i class="fa-solid fa-user-group"></i></div>
-                    <div class="text-sm text-emerald-200 font-bold mb-2">盘活/释放人力</div>
-                    <div class="text-4xl font-black text-white">67 <span class="text-lg font-normal">人</span></div>
-                    <div class="mt-2 text-sm text-emerald-300">含 66名一线接线员 + 1名专职派单员</div>
-                </div>
-            </div>
-        </div>
+  <!-- ═══════════ 8. 场景一：查询退款进度 ═══════════ -->
+  <section class="slide tight" data-title="场景一查询退款" contenteditable="false">
+    <p class="kicker">// 场景一 · 查询退款进度 · 节点3C</p>
+    <h2 class="h2">3.4.2 场景一：查询退款（AI覆盖率~63%）</h2>
+    <div class="flow-wrap mt-s">
+      <div class="fn fn-b">节点2<br>场景识别</div><span class="arw">→</span>
+      <div class="fn fn-b">节点3C<br>播报退款话术</div><span class="arw">→</span>
+      <div class="fn fn-y"><strong>复杂度判断</strong><br>R1-R5匹配</div><span class="arw">→</span>
+      <div class="fn fn-g">简单场景<br>1认可/2转人工</div><span class="arw">→</span>
+      <div class="fn fn-r">复杂场景<br>直接转人工</div>
     </div>
+    <div class="script-box mt-s">
+      <div class="label">节点3C 播报话术（简单场景·信息告知型）</div>
+      <p><b>场景A·退款已到账：</b>"您好，这里是微信小店官方客服。关于您此前反馈的订单退款问题，经系统核实，您的退款已于X月X日退回至原支付方式，请您核实账户明细。如有疑问请按2号键转接人工客服。"</p>
+      <p><b>场景B·退款处理中：</b>"您好，经核实您的退款正在处理中，预计1-3个工作日到账。如超时未收到可再次联系我们。已了解请按1号键，需咨询请按2号键。"</p>
+      <p><b>场景C·待商家收货：</b>"您好，您的退货商品已送达商家，商家确认收货后预计1-3个工作日退款到账。已了解请按1号键，需其他帮助请按2号键。"</p>
+    </div>
+    <p class="fz-xs mt-s" style="color:#8287a8">节点3C在节点3C与4之间插入复杂度判断。预估失联率从20%降至7%以下。</p>
+    <aside class="notes">
+      <p>查询退款进度是三个场景中最为简单的——复杂场景占比37%，简单场景占比63%。其核心判断变量仅有一个：<strong>是否属于复杂场景</strong>。</p>
+      <p>我们在节点3C之后插入一个复杂度判断模块，由R1至R5五条规则进行匹配——质量问题、金额争议、退款已到账但用户声称未收到、已赔付后再次进线、线下退款——命中任何一条即判定为复杂场景，直接转接人工。</p>
+      <p>未命中规则的即为简单场景，由AI外呼播报退款进度，随后提供两个按键选项：1键确认、2键转人工。增加复杂度判断的原因在于：查询退款场景中有5条漏转工单，其中4条失联。加入此判断后，预估失联率可从20%压缩至7%以下。</p>
+      <p>话术设计较为直接，分为三种情形：退款已到账、处理中、待商家确认收货。逻辑链条为：告知信息→提供选项→结束通话。无需追问"还有什么可以帮您"——AI外呼的职责是告知与收口，而非开放式对话。</p>
+    </aside>
+  </section>
 
-    <!-- Navigation Controls -->
-    <div class="nav-btn prev-btn" onclick="prevSlide()"><i class="fa-solid fa-chevron-left text-xl"></i></div>
-    <div class="nav-btn next-btn" onclick="nextSlide()"><i class="fa-solid fa-chevron-right text-xl"></i></div>
-    <div class="page-indicator" id="page-indicator">1 / 11</div>
+  <!-- ═══════════ 9. 场景二：催促售后进度 ═══════════ -->
+  <section class="slide tight" data-title="场景二催促售后" contenteditable="false">
+    <p class="kicker">// 场景二 · 催促售后进度 · 节点3B</p>
+    <h2 class="h2">3.4.3 场景二：催促售后（AI覆盖率~46%）</h2>
+    <div class="flow-wrap mt-s">
+      <div class="fn fn-b">节点2<br>场景识别</div><span class="arw">→</span>
+      <div class="fn fn-b">节点3B<br>播报进度话术</div><span class="arw">→</span>
+      <div class="fn fn-y"><strong>复杂度+<br>商家态度判断</strong><br>R1-R11匹配</div><span class="arw">→</span>
+      <div class="fn fn-g">简单场景<br>1认可/2转人工</div><span class="arw">→</span>
+      <div class="fn fn-r">复杂场景<br>直接转人工</div>
+    </div>
+    <p class="tc fz-xs" style="color:#8287a8">节点3B比3C新增3条专有条件：R6商家已拒绝 · R7商家承诺未履行 · R8商家已处理仍催促进度</p>
+    <div class="script-box mt-s">
+      <div class="label">节点3B 播报话术（简单场景·进度告知型）</div>
+      <p><b>场景A·售后正常处理中：</b>"您好，这里是微信小店官方客服。关于您此前反馈的售后处理进度问题，经核实，您的售后申请目前处于正常处理时效内，商家预计在48小时内完成审核。审核结果会通过微信服务通知推送给您。如您已了解，请按1号键。如需加急处理请按2号键。"</p>
+      <p><b>场景B·商家已处理但用户未确认：</b>"您好，经核实商家已对您的售后申请做出处理，请您打开微信小店订单页面查看商家回复。如认可商家方案请按1号键，如未能满足诉求请按2号键转接人工。"</p>
+    </div>
+    <p class="fz-xs mt-s" style="color:#8287a8">催促场景复杂占比54%（查询类仅37%），失联率32%。人为干预边际收益达35pp——AI覆盖率仅46%。</p>
+    <aside class="notes">
+      <p>催促售后场景相较于查询退款更为复杂。复杂场景占比为54%对37%，失联率为32%对20%。这印证了前述判断：<strong>判断力要求越高的场景，AI覆盖率越低</strong>。</p>
+      <p>节点3B的判断逻辑新增一个维度——不仅评估复杂度，还需评估商家合作态度。相较于节点3C，增加了三条专有触发条件：R6商家已拒绝过售后、R7商家承诺未履行、R8商家已处理但用户仍在催促。这三种情形涉及对立情绪与信任破裂，AI无法有效应对。</p>
+      <p>另一值得关注的数据：人为干预的边际收益高达35个百分点。即，将一个复杂工单从AI切换至人工，解决率可提升35个百分点。这说明：<strong>复杂场景下并非AI表现不佳，而是人工的边际价值确实更高。</strong></p>
+    </aside>
+  </section>
 
-    <script>
-        let currentSlide = 1;
-        const totalSlides = 11;
+  <!-- ═══════════ 10. 场景三：极速退款 ═══════════ -->
+  <section class="slide tight" data-title="场景三极速退款" contenteditable="false">
+    <p class="kicker">// 场景三 · 极速退款</p>
+    <h2 class="h2">3.4.4 场景三：极速退款（AI覆盖率~35%）</h2>
+    <div class="flow-wrap mt-s">
+      <div class="fn fn-b">节点2<br>场景识别</div><span class="arw">→</span>
+      <div class="fn fn-p"><strong>回款状态判断</strong><br>（前置步骤）</div><span class="arw">→</span>
+      <div class="fn fn-g">已回款+商家愿处理<br>外呼核实→闭环</div><span class="arw">→</span>
+      <div class="fn fn-r">已回款+商家拒绝<br><strong>跳过派单→谈赔</strong></div><span class="arw">→</span>
+      <div class="fn fn-r">未回款+商家拒绝<br>外呼解释→PK闭环</div>
+    </div>
+    <p class="tc fz-xs" style="color:#8287a8">极速退款的关键变量为"是否回款"，而非3B/3C中使用的"是否复杂场景"</p>
+    <div class="script-box mt-s">
+      <div class="label">极速退款播报话术</div>
+      <p><b>场景A·已回款+商家愿意处理：</b>"您好，这里是微信小店官方客服。关于您此前享受极速退款的订单，经核实商家已确认您的退款申请并进行处理。如已收到退款请按1号键确认，如尚未收到请按2号键。"</p>
+      <p><b>场景B·已回款+商家拒绝→谈赔：</b>"您好，关于您反馈的问题，考虑到您已享受极速退款服务且商家未能满足诉求，为保障您的服务体验，我们为您申请了一笔平台服务体验金作为补偿，预计1-3个工作日入账至您的微信零钱。如接受请按1号键，如需进一步协商请按2号键。"</p>
+      <p><b>场景C·不认可A/B方案：</b>"很抱歉给您添麻烦了，由于您的订单已享受了平台的极速退款，目前暂不支持线上的二次退款，建议您可再次联系商家进行协商。"</p>
+    </div>
+    <aside class="notes">
+      <p>极速退款是三个场景中最为特殊的一个。其判断变量与另外两个场景截然不同——不看复杂度，而看<strong>回款状态</strong>。</p>
+      <p>原因前文数据已充分揭示：已回款的用户，其核心诉求并非退款去向，而是"能否再获补偿"。因此，该场景的流程设计以回款状态判断为首要步骤。</p>
+      <p>已回款且商家愿意处理的，外呼核实后即可闭环。已回款但商家拒绝的，跳过派单直接进入谈赔路径。这是数据驱动的结论——那3条走谈赔路径的工单全部成功解决。</p>
+      <p>但需诚实指出：极速退款的AI覆盖率仅为35%，是三个场景中最低的。因为其核心动作——谈赔——涉及金额协商与情绪处理，当前AI的外呼能力尚不足以完全承担。35%已是当前能力的天花板。这同样具有正面意义：<strong>边界清晰比包揽一切更重要。</strong></p>
+    </aside>
+  </section>
 
-        function updateSlides() {
-            document.querySelectorAll('.slide').forEach((el, index) => {
-                if (index + 1 === currentSlide) {
-                    el.classList.add('active');
-                } else {
-                    el.classList.remove('active');
-                }
-            });
-            document.getElementById('page-indicator').innerText = `${currentSlide} / ${totalSlides}`;
+  <!-- ═══════════ 11. 智能操作+归档 ═══════════ -->
+  <section class="slide" data-title="智能操作与归档" contenteditable="false">
+    <p class="kicker">// part 03 · 步骤5-6</p>
+    <h2 class="h2">3.5-3.6 智能操作 & 智能归档</h2>
+    <div class="grid g3 mt-l">
+      <div class="card orange-top">
+        <h4>代发引擎</h4>
+        <p>判责确认→时效检查（纠纷2.0标准）→暗号模板匹配→代发执行→短信通知</p>
+      </div>
+      <div class="card green-top">
+        <h4>谈赔引擎</h4>
+        <p>建联商家确认→梯度金额计算（100元内全额，100+两轮梯度不赔满，首轮30-50%，二轮50-70%）→提赔申请→免责话术→到账追踪</p>
+      </div>
+      <div class="card red-top">
+        <h4>砍单引擎</h4>
+        <p>条件匹配→现场评估→疑难组路由。AI仅执行匹配与分派，最终决策权保留在人工</p>
+      </div>
+    </div>
+    <div class="grid g2 mt-m">
+      <div>
+        <h4 class="h3">智能归档</h4>
+        <p class="fz-sm">ASR语音转文字→LLM提取关键信息→按模板输出结构化字段（处理方式/用户态度/是否需跟进）→自动打标归档。<strong style="color:#4ade80">从3分钟→10秒</strong>，人工仅需最终确认。</p>
+      </div>
+      <div>
+        <h4 class="h3">效果预估</h4>
+        <div class="compare-bar-wrap" style="padding:12px">
+          <div class="bar-group"><div class="lbl">当前</div><div class="bar" style="height:60px;background:rgba(255,255,255,.2)"></div><div class="num" style="font-size:18px">3min</div><div class="lbl">归档耗时</div></div>
+          <div style="font-size:32px;color:#4ade80;font-weight:900">→</div>
+          <div class="bar-group"><div class="lbl">AI后</div><div class="bar" style="height:20px;background:#4ade80"></div><div class="num" style="font-size:18px;color:#4ade80">10s</div><div class="lbl">归档耗时</div></div>
+        </div>
+      </div>
+    </div>
+    <aside class="notes">
+      <p>第五步和第六步相对直接。首先介绍三个自动化引擎。</p>
+      <p><strong>代发引擎</strong>最为简洁——判责确认、时效检查、模板匹配、执行、通知。该链路的每个节点，人工操作时均需查询文档、计算时效、填写模板，AI可在一秒内完成全部流程。</p>
+      <p><strong>谈赔引擎</strong>较为复杂，涉及金额梯度计算：100元以内全额赔付，超过100元执行两轮梯度方案而非一次性赔满。首轮赔付30%至50%，第二轮赔付50%至70%。此设计的目的是保留协商空间——若一次性赔到位，用户缺少"通过沟通争取到的结果感"，反而可能不满意。</p>
+      <p><strong>砍单引擎</strong>有一条最重要的规则：AI仅执行条件匹配和路由分派，最终决策权始终保留在人工。砍单涉及商家核心利益，一旦出错后果严重——此类决策绝不可交由机器。</p>
+      <p>归档环节从3分钟压缩至10秒，ASR转写、LLM提取、自动打标、人工确认——这是最典型的"让人仅做最终确认"的场景。</p>
+    </aside>
+  </section>
+
+  <!-- ═══════════ 12. 数据验证 ═══════════ -->
+  <section class="slide tight" data-title="数据验证" contenteditable="false">
+    <p class="kicker">// part 04 · 数据验证</p>
+    <h2 class="h2">4. 数据验证结论</h2>
+    <div class="grid g2 mt-m">
+      <div>
+        <h4 class="h3">极速退款（20条）</h4>
+        <table class="data-table small">
+          <tr><th>回款状态</th><th>商家态度</th><th>建议路径</th><th>效果</th></tr>
+          <tr><td>已回款</td><td>愿意处理</td><td>外呼核实→闭环</td><td><span class="tag tag-g">高成功率</span></td></tr>
+          <tr><td>已回款</td><td>拒绝处理</td><td>不派单→直接谈赔</td><td><span class="tag tag-g">100%解决</span></td></tr>
+          <tr><td>未回款</td><td>拒绝处理</td><td>外呼解释→PK闭环</td><td>兜底闭环</td></tr>
+        </table>
+        <p class="fz-xs mt-s">已回款+派单组→50%失联；未回款+派单组→75%失联；<strong>走谈赔3条→100%解决</strong>。结论：极速退款场景下派单无效。</p>
+      </div>
+      <div>
+        <h4 class="h3">查询退款（30条）</h4>
+        <p class="fz-sm">派单组解决率67%，未派单组50%——差距17pp。整体派单率仅20%，5条漏转工单（4条失联）可通过复杂度判断前置识别并转人工挽回。</p>
+        <h4 class="h3 mt-s">催促售后（28条）</h4>
+        <p class="fz-sm">复杂场景占比54%（查询类仅37%），失联率32%。人为干预边际收益高达35pp。节点3B需在3C基础上增加3条专有条件。</p>
+      </div>
+    </div>
+    <div class="insight good mt-s">
+      <strong>核心结论：</strong>三个场景的AI覆盖率差异（63% vs 46% vs 35%）反映了AI能力边界与人类判断力需求的正相关——判责要求越高的场景，AI覆盖率越低。这不是AI的短板，是对AI能力的诚实认识。
+    </div>
+    <aside class="notes">
+      <p>第四部分以数据为支撑进行验证。提炼三个场景的核心数据。</p>
+      <p>极速退款：已回款派单组失联率50%，走谈赔路径的三条工单100%解决。结论十分明确——<strong>该场景下派单策略无效，正确的做法是跳过派单直接进入谈赔。</strong></p>
+      <p>查询退款：增加复杂度判断后，预估失联率从20%降至7%以下。这一改善仅依靠在两个节点之间插入一个判断模块。</p>
+      <p>催促售后：复杂场景占比54%，AI仅能覆盖46%。但这并非负面数据——覆盖率的差异恰恰印证了策略的正确性。<strong>AI越不擅长的场景，越应诚实判断"此案不宜由AI处理"并转交人工</strong>，而非用一个似是而非的方案应对用户。</p>
+    </aside>
+  </section>
+
+  <!-- ═══════════ 13. 全量验证+分场景量化 ═══════════ -->
+  <section class="slide tight" data-title="量化指标" contenteditable="false">
+    <p class="kicker">// part 04-05 · 全量验证与量化预估</p>
+    <h2 class="h2">4.4 衣帽箱包全量 + 5.2 分场景量化</h2>
+    <div class="grid g2">
+      <div>
+        <h4 class="h3">衣帽箱包全量验证（163条）</h4>
+        <table class="data-table small">
+          <tr><th>场景类别</th><th>样本量</th><th>和解率</th><th>AI策略</th></tr>
+          <tr><td>运费类</td><td>33</td><td><span class="tag tag-g">61%</span></td><td><span class="tag tag-g">机器人优先</span></td></tr>
+          <tr><td>平台介入类</td><td>13</td><td>62%</td><td><span class="tag tag-r">直接转人工</span></td></tr>
+          <tr><td>售后综合类</td><td>31</td><td>60%</td><td>按复杂度分流</td></tr>
+          <tr><td>多笔叠加</td><td>13</td><td><span class="tag tag-r">0%</span></td><td><span class="tag tag-r">必须转人工</span></td></tr>
+        </table>
+      </div>
+      <div>
+        <h4 class="h3">分场景量化指标</h4>
+        <table class="data-table small">
+          <tr><th>指标</th><th>当前</th><th>目标</th><th>提升</th><th>依据</th></tr>
+          <tr><td>单均非沟通耗时</td><td>10min</td><td><span class="tag tag-g"><1min</span></td><td>↓90%+</td><td>步骤1/4/5被AI接管</td></tr>
+          <tr><td>查询退款-解决率</td><td>53%</td><td><span class="tag tag-g">70%+</span></td><td>+17%</td><td>复杂度判断挽救漏转工单</td></tr>
+          <tr><td>查询退款-失联率</td><td>20%</td><td><span class="tag tag-g"><7%</span></td><td>↓13pp</td><td>复杂场景直接转人工</td></tr>
+          <tr><td>催促售后-解决率</td><td>46%</td><td><span class="tag tag-g">60%+</span></td><td>+14%</td><td>转人工阈值降低+3B专有条件</td></tr>
+          <tr><td>催促售后-失联率</td><td>32%</td><td><span class="tag tag-g"><15%</span></td><td>↓17pp</td><td>减少规则解释占比+兜底方案</td></tr>
+          <tr><td>极速退款-失联率</td><td>45%</td><td><span class="tag tag-g"><20%</span></td><td>↓25pp</td><td>回款判断前置+跳过派单</td></tr>
+          <tr><td>整体和解率</td><td>61%</td><td><span class="tag tag-g">75%+</span></td><td>+14pp</td><td>场景分层+金额判断+多笔识别</td></tr>
+          <tr><td>日处理量</td><td>30-40单</td><td><span class="tag tag-g">60-80单</span></td><td>翻倍</td><td>释放67%非沟通时间</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="compare-bar-wrap mt-s">
+      <div class="bar-group"><div class="lbl">AI介入前</div><div class="bar" style="height:70px;background:rgba(255,255,255,.15)"></div><div class="num">30-40单</div><div class="lbl">日均人效</div></div>
+      <div style="font-size:36px;color:#4ade80;font-weight:900">→</div>
+      <div class="bar-group"><div class="lbl">AI介入后</div><div class="bar" style="height:140px;background:linear-gradient(180deg,#4ade80,#22d3ee)"></div><div class="num" style="color:#4ade80">60-80单</div><div class="lbl">日均人效</div></div>
+    </div>
+    <p class="tc fz-sm" style="color:#4ade80;font-weight:700">人效提升100%-167% · 释放67%非沟通耗时</p>
+    <aside class="notes">
+      <p>本页数据较为密集，重点说明其中几项关键指标。</p>
+      <p>衣帽箱包163条全量验证中，<strong>多笔叠加订单的和解率为0%</strong>——这意味着只要用户涉及多笔订单、多个诉求叠加，AI完全无法有效处理，必须转交人工。这是一个清晰的、不可逾越的能力边界。</p>
+      <p>分场景量化指标中，重点强调两个数字。第一，<strong>单均非沟通耗时从10分钟降至不足1分钟</strong>，降幅超过90%，这依赖于步骤1、4、5被AI完全接管。第二，<strong>客服日均处理量从30-40单翻倍至60-80单</strong>。</p>
+      <p>但必须郑重声明：<strong>人效翻倍并非意味着裁减一半人力</strong>。人效翻倍的真正含义是——同等规模的人力可以专注于更高价值的工作：复杂场景的判断、情绪化用户的安抚、高金额订单的决策。这是人机分工的升级，而非人机替代。</p>
+    </aside>
+  </section>
+
+  <!-- ═══════════ 14. R1-R18 规则总表 ═══════════ -->
+  <section class="slide tight" data-title="R1-R18规则总表" contenteditable="false">
+    <p class="kicker">// part 06 · R1-R18 规则</p>
+    <h2 class="h2">6. 智能服务标签判定规则总表（R1-R18）</h2>
+    <p class="fz-sm" style="color:#c3c8e6">综合四个数据集、241条工单验证。分为三类：复杂标签（转人工）、简单标签（AI外呼+按键）、特殊标签（升级/争议/高金额）</p>
+    <table class="data-table xsmall" style="font-size:10px">
+      <tr><th>编号</th><th>触发条件</th><th>场景</th><th>标签</th><th>路由方向</th></tr>
+      <tr><td>R1</td><td>质量问题+仅退款/退货退款诉求</td><td>3B/3C</td><td><span class="tag tag-r">复杂</span></td><td>直接转人工</td></tr>
+      <tr><td>R2</td><td>差价/金额争议</td><td>3B/3C</td><td><span class="tag tag-r">复杂</span></td><td>直接转人工</td></tr>
+      <tr><td>R3</td><td>退款已到账但用户称未收到</td><td>3B/3C</td><td><span class="tag tag-r">复杂</span></td><td>直接转人工</td></tr>
+      <tr><td>R4</td><td>已赔付/谈赔后再次进线</td><td>3B/3C</td><td><span class="tag tag-r">复杂</span></td><td>直接转人工</td></tr>
+      <tr><td>R5</td><td>线下退款/非标准化退款路径</td><td>3B/3C</td><td><span class="tag tag-r">复杂</span></td><td>直接转人工</td></tr>
+      <tr><td>R6</td><td>商家已拒绝过售后申请</td><td>3B专属</td><td><span class="tag tag-r">复杂</span></td><td>直接转人工</td></tr>
+      <tr><td>R7</td><td>商家承诺未履行</td><td>3B专属</td><td><span class="tag tag-r">复杂</span></td><td>直接转人工</td></tr>
+      <tr><td>R8</td><td>商家已处理但用户仍催促进度</td><td>3B专属</td><td><span class="tag tag-r">复杂</span></td><td>直接转人工</td></tr>
+      <tr><td>R9</td><td>超售后期+质量问题</td><td>3B/3C</td><td><span class="tag tag-r">复杂</span></td><td>直接转人工</td></tr>
+      <tr><td>R10</td><td>同一用户多笔订单/多诉求叠加</td><td>全场景</td><td><span class="tag tag-r">复杂</span></td><td>直接转人工</td></tr>
+      <tr><td>R11</td><td>假一赔三/高期望值诉求</td><td>3B</td><td><span class="tag tag-r">复杂</span></td><td>直接转人工</td></tr>
+      <tr><td>R12</td><td>极速退款-已回款+商家拒绝</td><td>极速退款</td><td><span class="tag tag-r">争议</span></td><td>跳过派单→直接谈赔</td></tr>
+      <tr><td>R13</td><td>极速退款-未回款+商家拒绝</td><td>极速退款</td><td><span class="tag tag-r">争议</span></td><td>外呼解释→PK闭环</td></tr>
+      <tr><td>R14</td><td>订单金额超过500元</td><td>全场景</td><td><span class="tag tag-y">高金额</span></td><td>优先转人工处理</td></tr>
+      <tr><td>R15</td><td>处理时已退款/纯粹查询进度</td><td>3B/3C</td><td><span class="tag tag-g">简单</span></td><td>AI外呼+按键交互</td></tr>
+      <tr><td>R16</td><td>用户已同意方案/外呼确认结果</td><td>3B/3C</td><td><span class="tag tag-g">简单</span></td><td>AI外呼+按键交互</td></tr>
+      <tr><td>R17</td><td>极速退款-已回款+商家愿意处理</td><td>极速退款</td><td><span class="tag tag-g">简单</span></td><td>外呼核实→闭环</td></tr>
+      <tr><td>R18</td><td>简单场景用户按2→一次安抚→仍不认可</td><td>全场景</td><td><span class="tag tag-y">升级</span></td><td>转人工（避免循环安抚）</td></tr>
+    </table>
+    <aside class="notes">
+      <p>本页为整场汇报的核心交付物——<strong>R1至R18十八条标签判定规则</strong>。综合四个数据集、241条工单验证后得出。</p>
+      <p>十八条规则分归三类。第一类R1至R11为复杂标签——全部直接转人工，覆盖质量问题、金额争议、售后纠纷、多笔叠加等最常见的高复杂度场景。</p>
+      <p>第二类R15至R17为简单标签——AI外呼配合按键交互。纯粹查询进度、已同意方案做确认等无需判断力的场景。</p>
+      <p>第三类R12至R14及R18为特殊标签——争议类、高金额类、升级类。此类需特殊处理路径，非简单的"转人工"或"AI外呼"二选一。例如R14规定订单金额超过500元即优先转人工处理。</p>
+      <p><strong>上述十八条规则可直接写入智能外呼节点的判断逻辑，作为工程落地的明确判定标准。</strong></p>
+    </aside>
+  </section>
+
+  <!-- ═══════════ 15. 总结 ═══════════ -->
+  <section class="slide" data-title="总结" contenteditable="false">
+    <p class="kicker">// summary</p>
+    <h2 class="h2">总结</h2>
+    <div class="conclusion-slide">
+      <p>本方案的核心思想可归结为一句话：<strong>让人只做必须人做的事。</strong></p>
+      <p>通过对241条真实工单的系统分析，我们得到了一个清晰的结论——外呼工单的处理链路中，67%的耗时消耗在不需要人类判断力的机械操作上。AI系统可以接管这些环节，使客服从"全链路操作者"转变为"疑难问题决策者"。</p>
+      <p>技术架构上，我们采用<strong>规则引擎+RAG知识库+LLM推理</strong>的三层混合架构，实现了逐层降本策略。18条标签判定规则（R1-R18）综合了四个数据集、241条工单的验证结果，可直接写入智能外呼节点的判断逻辑。</p>
+      <p style="font-size:16px;margin-top:16px"><strong>智能化改造不是"用AI替代人"，而是在人机之间建立一条清晰的分界线——线的左边，机器以零出错的精度高效执行规则明确的操作；线的右边，人专注于需要判断力、共情力和决策力的疑难问题。分界线越清晰，人机协作的效率越高。</strong></p>
+    </div>
+    <aside class="notes">
+      <p>最后进行总结。今日汇报的核心思想仅有一句话：<strong>让人只做必须人做的事</strong>。</p>
+      <p>241条工单的验证结果清晰地表明：67%的耗时属于机械操作。AI可以接管这部分工作。但我们的目标并非将人从流程中移除，而是让人从不应由人完成的事务中解放出来。</p>
+      <p>从三个场景的数据中，我获得了一个更深层的认知。三个场景的AI覆盖率分别为63%、46%、35%——呈递减趋势。或许有人将此解读为AI能力不足的证明，但我认为这恰恰体现了<strong>对AI能力最诚实的认知</strong>。边界越清晰，信任越牢固。若以"AI什么都能做"的姿态进行掩盖，一旦出现问题，才是真正的信任崩塌。</p>
+      <p>十八条规则是本次方案的交付物。期望半年后回顾时，这些规则已在系统中持续运行，成为客服日常操作的默认背景。这才是"智能化"的真正落地。</p>
+      <p>感谢各位的宝贵时间，欢迎随时提问交流。</p>
+    </aside>
+  </section>
+
+  <!-- ═══════════ 16. THANKS ═══════════ -->
+  <section class="slide thanks" data-title="谢谢" contenteditable="false">
+    <h1 class="h1" style="font-size:clamp(48px,6vw,80px);background:linear-gradient(135deg,#22d3ee,#a855f7);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent">谢谢</h1>
+    <p class="lede mt-m">微信小店客服外呼工单智能化改造汇报方案 · V5.0</p>
+    <p class="fz-sm mt-l" style="color:#8287a8">数据覆盖241条真实工单 · 全链路六步闭环 · R1-R18规则总表</p>
+    <p class="key-hint">按 <span class="mono">S</span> 演讲者视图 · <span class="mono">T</span> 切换主题 · <span class="mono">F</span> 全屏 · <span class="mono">E</span> 编辑</p>
+    <aside class="notes">
+      <p>以上就是今天全部的汇报内容。核心信息总结为四点：<strong>241条数据验证、六步闭环方案、18条可落地的规则、人效翻倍的目标</strong>。感谢各位的时间，欢迎就任何细节进行深入讨论。</p>
+    </aside>
+  </section>
+
+</div>
+
+<div style="position:fixed;bottom:8px;left:12px;font-size:10px;color:rgba(255,255,255,.15);z-index:100;pointer-events:none">
+  E 编辑 · ESC 保存退出 · S 演讲者 · T 主题 · ← → 翻页 · F 全屏 · O 总览
+</div>
+<div class="progress-bar"><span></span></div>
+
+<script>
+/* ============ PARTICLE SYSTEM ============ */
+(function(){
+  var canvas = document.getElementById('particle-canvas');
+  var ctx = canvas.getContext('2d');
+  var particles = [];
+  var NUM = 180;
+  var mouseX = -1000, mouseY = -1000;
+
+  function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function createParticle(){
+    return {
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: -(Math.random() * 0.5 + 0.2),
+      r: Math.random() * 2 + 0.5,
+      alpha: Math.random() * 0.6 + 0.2,
+      phase: Math.random() * Math.PI * 2,
+      color: Math.random() < 0.5 ? '34,211,238' : '168,85,247'
+    };
+  }
+
+  for (var i = 0; i < NUM; i++) {
+    particles.push(createParticle());
+  }
+
+  // Lines between nearby particles
+  var lines = [];
+
+  function animate(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (var i = 0; i < particles.length; i++) {
+      var p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Gentle mouse attraction
+      var dx = mouseX - p.x;
+      var dy = mouseY - p.y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 200) {
+        p.vx += (dx / dist) * 0.02;
+        p.vy += (dy / dist) * 0.02;
+      }
+
+      // Speed limit
+      var speed = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
+      if (speed > 1.5) {
+        p.vx = (p.vx / speed) * 1.5;
+        p.vy = (p.vy / speed) * 1.5;
+      }
+
+      // Wrap around
+      if (p.x < -20) p.x = canvas.width + 20;
+      if (p.x > canvas.width + 20) p.x = -20;
+      if (p.y < -20) p.y = canvas.height + 20;
+      if (p.y > canvas.height + 20) p.y = -20;
+
+      // Draw particle with glow
+      ctx.beginPath();
+      var glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+      glow.addColorStop(0, 'rgba(' + p.color + ',' + p.alpha + ')');
+      glow.addColorStop(0.3, 'rgba(' + p.color + ',' + (p.alpha * 0.6) + ')');
+      glow.addColorStop(1, 'rgba(' + p.color + ',0)');
+      ctx.fillStyle = glow;
+      ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(' + p.color + ',' + Math.min(1, p.alpha + 0.3) + ')';
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Draw connecting lines between nearby particles
+    for (var i = 0; i < particles.length; i++) {
+      for (var j = i + 1; j < particles.length; j++) {
+        var dx = particles[i].x - particles[j].x;
+        var dy = particles[i].y - particles[j].y;
+        var dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 100) {
+          ctx.beginPath();
+          ctx.strokeStyle = 'rgba(34,211,238,' + (0.08 * (1 - dist/100)) + ')';
+          ctx.lineWidth = 0.5;
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
         }
+      }
+    }
 
-        function nextSlide() {
-            if (currentSlide < totalSlides) {
-                currentSlide++;
-                updateSlides();
-            }
+    requestAnimationFrame(animate);
+  }
+
+  document.addEventListener('mousemove', function(e){
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+
+  animate();
+})();
+
+/* ============ RUNTIME ============ */
+(function(){
+  var slides = Array.from(document.querySelectorAll('.slide'));
+  if (!slides.length) return;
+  var total = slides.length;
+  var idx = 0;
+  var bar = document.querySelector('.progress-bar span');
+
+  function go(n){
+    n = Math.max(0, Math.min(total - 1, n));
+    slides.forEach(function(s, i){
+      s.classList.toggle('is-active', i === n);
+      s.classList.toggle('is-prev', i === n - 1);
+    });
+    idx = n;
+    if (bar) bar.style.width = ((n + 1) / total * 100) + '%';
+    location.hash = '#/' + (n + 1);
+    // Trigger particle burst on slide change
+    var active = slides[n];
+    if (active && !active.querySelector('.slide-burst-done')) {
+      burstParticles();
+    }
+  }
+
+  // Particle burst effect on slide transition
+  function burstParticles(){
+    var canvas = document.getElementById('particle-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var cx = canvas.width / 2;
+    var cy = canvas.height / 2;
+    var burstParticles = [];
+    for (var i = 0; i < 40; i++) {
+      var a = Math.random() * Math.PI * 2;
+      var s = Math.random() * 200 + 80;
+      burstParticles.push({
+        x: cx, y: cy,
+        vx: Math.cos(a) * s, vy: Math.sin(a) * s,
+        life: 1, r: Math.random() * 3 + 1,
+        c: Math.random() < 0.5 ? '34,211,238' : '168,85,247'
+      });
+    }
+    var start = performance.now();
+    function draw(now){
+      var dt = (now - start) / 1000;
+      start = now;
+      for (var i = 0; i < burstParticles.length; i++) {
+        var p = burstParticles[i];
+        if (p.life <= 0) continue;
+        p.vy += 120 * dt;
+        p.vx *= 0.99; p.vy *= 0.99;
+        p.x += p.vx * dt; p.y += p.vy * dt;
+        p.life -= 0.025;
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillStyle = 'rgb(' + p.c + ')';
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      if (burstParticles.some(function(p){return p.life > 0;})) {
+        requestAnimationFrame(draw);
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+
+  // Theme cycling
+  var themesAttr = document.documentElement.getAttribute('data-themes') || '';
+  var themes = themesAttr.split(',').map(function(s){return s.trim();}).filter(Boolean);
+  var themeIdx = 0;
+
+  // Keyboard
+  document.addEventListener('keydown', function(e){
+    if (window.__editorActive) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    switch(e.key){
+      case 'ArrowRight': case ' ': case 'PageDown': go(idx + 1); e.preventDefault(); break;
+      case 'ArrowLeft': case 'PageUp': go(idx - 1); e.preventDefault(); break;
+      case 'Home': go(0); break;
+      case 'End': go(total - 1); break;
+      case 'f': case 'F':
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+        break;
+      case 't': case 'T':
+        if (themes.length > 1) {
+          themeIdx = (themeIdx + 1) % themes.length;
+          document.documentElement.setAttribute('data-theme', themes[themeIdx]);
         }
-
-        function prevSlide() {
-            if (currentSlide > 1) {
-                currentSlide--;
-                updateSlides();
-            }
+        break;
+      case 'o': case 'O':
+        var ov = document.querySelector('.overview');
+        if (!ov) {
+          ov = document.createElement('div'); ov.className = 'overview';
+          slides.forEach(function(s, i){
+            var t = document.createElement('div'); t.className = 'thumb';
+            t.innerHTML = '<span class="n">' + (i+1) + '</span><span class="t">' + (s.getAttribute('data-title') || '') + '</span>';
+            t.addEventListener('click', function(){ go(i); ov.classList.remove('open'); });
+            ov.appendChild(t);
+          });
+          document.body.appendChild(ov);
         }
+        ov.classList.toggle('open');
+        break;
+      case 's': case 'S':
+        alert('演讲者视图：请在新窗口中打开此页面并按 S 键。演示者弹窗功能需完整 runtime 支持。');
+        break;
+      case 'n': case 'N':
+        var no = document.querySelector('.notes-overlay');
+        if (!no) {
+          no = document.createElement('div'); no.className = 'notes-overlay';
+          document.body.appendChild(no);
+        }
+        var active = slides[idx];
+        var notesEl = active ? active.querySelector('.notes') : null;
+        if (notesEl) {
+          no.innerHTML = '<div style="max-width:800px;margin:0 auto">' + notesEl.innerHTML + '</div>';
+        } else {
+          no.innerHTML = '<div style="max-width:800px;margin:0 auto;color:#8287a8">（此页暂无逐字稿）</div>';
+        }
+        no.classList.toggle('open');
+        break;
+      case 'Escape':
+        var ov2 = document.querySelector('.overview');
+        if (ov2) ov2.classList.remove('open');
+        var no2 = document.querySelector('.notes-overview, .notes-overlay');
+        if (no2) no2.classList.remove('open');
+        break;
+    }
+  });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === 'Space') {
-                nextSlide();
-            } else if (e.key === 'ArrowLeft') {
-                prevSlide();
-            }
-        });
-    </script>
+  // Hash deep link
+  function fromHash(){
+    var m = /^#\/(\d+)/.exec(location.hash || '');
+    if (m) go(Math.max(0, parseInt(m[1], 10) - 1));
+  }
+  window.addEventListener('hashchange', fromHash);
+  fromHash();
+  go(idx);
+})();
+
+/* ============ EDIT MODE ============ */
+(function(){
+  var STORAGE_KEY = 'ppt-particle-cyber-' + (location.pathname.replace(/[^a-zA-Z0-9]/g,'_') || 'default');
+
+  try {
+    var saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      document.open();
+      document.write(saved);
+      document.close();
+    }
+  } catch(e) {}
+
+  window.__editorActive = false;
+
+  document.addEventListener('keydown', function(e){
+    if ((e.key === 'e' || e.key === 'E') && !e.metaKey && !e.ctrlKey && !e.altKey && !window.__editorActive) {
+      window.__editorActive = true;
+      // Make all slides and text elements editable
+      var slides = document.querySelectorAll('.slide');
+      slides.forEach(function(s){ s.contentEditable = 'true'; });
+      // Make specific text elements editable
+      var editTargets = document.querySelectorAll('h1,h2,h3,h4,p,li,td,th,span:not(.tag):not(.mono),b,strong,.lede,.kicker,.accent,.accent2,.num,.t,.d,.lbl');
+      editTargets.forEach(function(el){ el.contentEditable = 'true'; });
+      document.body.classList.add('editing');
+      var hint = document.querySelector('.edit-hint');
+      if (hint) hint.style.display = 'block';
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
+    if (e.key === 'Escape' && window.__editorActive) {
+      window.__editorActive = false;
+      var slides = document.querySelectorAll('.slide');
+      slides.forEach(function(s){ s.contentEditable = 'false'; });
+      var editTargets = document.querySelectorAll('[contenteditable="true"]');
+      editTargets.forEach(function(el){
+        if (!el.hasAttribute('data-perma-edit')) el.contentEditable = 'false';
+      });
+      document.body.classList.remove('editing');
+      var hint = document.querySelector('.edit-hint');
+      if (hint) hint.style.display = 'none';
+      try {
+        localStorage.setItem(STORAGE_KEY, document.documentElement.outerHTML);
+      } catch(err) {}
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+  }, true);
+})();
+</script>
 </body>
 </html>
