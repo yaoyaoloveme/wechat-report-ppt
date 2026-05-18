@@ -3,657 +3,605 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能汇报文档 - 二线外呼全链路智能优化</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>商务汇报 - 二线外呼全链路智能优化 (离线打印版)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background-color: #0f172a; color: #f8fafc; overflow: hidden; }
-        .slide { display: none; height: 100vh; width: 100vw; padding: 2rem 4rem 6.5rem 4rem; animation: fadeIn 0.5s ease-in-out; }
-        .slide.active { display: flex; flex-direction: column; }
-        .slide > div:first-child:not(.flex-1) { margin-bottom: 1.5rem !important; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
-        .gradient-text { background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; color: transparent; }
-        
-        /* Navigation Controls */
-        .nav-btn { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); border-radius: 50%; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.3s; z-index: 50; border: 1px solid rgba(255,255,255,0.2); }
-        .nav-btn:hover { background: rgba(255,255,255,0.2); box-shadow: 0 0 15px rgba(56, 189, 248, 0.5); }
-        .prev-btn { left: 20px; }
-        .next-btn { right: 20px; }
-        .page-indicator { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 0.875rem; color: #94a3b8; letter-spacing: 2px; }
+/* 1. THE SETUP */
+* { box-sizing: border-box; }
+p { margin: 0; margin-bottom: 15px; }
+
+body {
+  background-color: #cbd5e1;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+  margin: 0;
+  min-height: 100vh;
+  padding: 20px 0;
+  place-items: center;
+}
+
+.slide-container {
+  align-items: flex-start;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  font-family: 'Noto Sans SC', sans-serif;
+  height: 720px;
+  justify-content: flex-start;
+  overflow: hidden;
+  padding: 50px 80px;
+  position: relative;
+  width: 1280px;
+}
+
+/* 1.1 BACKGROUND STYLING */
+.slide-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.05) 0%, transparent 70%);
+  z-index: 0;
+}
+.slide-container::after {
+  content: '';
+  position: absolute;
+  bottom: 30px;
+  left: 80px;
+  right: 80px;
+  height: 1px;
+  background-color: #e2e8f0;
+  z-index: 0;
+}
+.slide-container>* { position: relative; z-index: 1; }
+
+/* 2. CONSISTENT TYPOGRAPHY */
+.slide-container h1, .slide-container h2, .slide-container h3 {
+  color: #1e3a8a; font-weight: 700; font-family: 'Poppins', 'Noto Sans SC', sans-serif; margin: 0;
+}
+.slide-container p, .slide-container li, .slide-container th, .slide-container td {
+  color: #334155; font-family: 'Noto Sans SC', sans-serif;
+}
+.slide-container h1 { font-size: 60px; line-height: 1.2; }
+.slide-container .slide-title {
+  font-size: 36px; font-weight: 700; margin-bottom: 45px; text-align: left; width: 100%; color: #1e3a8a; display: flex; align-items: center;
+}
+.slide-container .slide-title::before {
+    content: ''; display: inline-block; width: 8px; height: 36px; background-color: #2563eb; margin-right: 20px;
+}
+.slide-container h3 { font-size: 26px; font-weight: 600; margin-bottom: 15px; }
+.slide-container p, .slide-container li { font-size: 18px; line-height: 1.6; }
+
+/* 3. LAYOUT DEFINITIONS */
+.content-area { display: flex; flex-direction: column; flex-grow: 1; justify-content: flex-start; width: 100%; }
+.two-column { align-items: flex-start; display: grid; grid-template-columns: 1fr 1fr; gap: 50px; width: 100%; }
+.box-card { background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 30px; border-radius: 8px; height: 100%; }
+
+/* 4. DATA VISUALS */
+.big-number { font-family: 'Poppins', sans-serif; font-size: 80px; font-weight: 700; color: #2563eb; line-height: 1; }
+.process-flow { display: flex; justify-content: space-between; width: 100%; margin-top: 50px; }
+.process-step { text-align: center; flex: 1; position: relative; }
+.process-step:not(:last-child)::after {
+    content: '\f061'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; top: 35px; right: -10%; color: #cbd5e1; font-size: 20px;
+}
+.step-icon {
+    width: 70px; height: 70px; background-color: #1e3a8a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 15px;
+}
+
+/* 5. TABLE STYLING */
+table { width: 100%; border-collapse: collapse; }
+th { background-color: #f1f5f9; color: #1e3a8a; font-weight: 700; padding: 12px 15px; text-align: left; border-bottom: 2px solid #1e3a8a; }
+td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; font-size: 16px;}
+.highlight-blue { background-color: #eff6ff; font-weight: 700; }
+
+.ticket-mockup { background-color: #fff; border: 2px solid #1e3a8a; border-radius: 8px; width: 80%; margin: 0 auto; overflow: hidden; }
+.ticket-header { background-color: #1e3a8a; color: white; padding: 10px 20px; font-weight: 700; }
+.ticket-body { padding: 20px; }
+.label-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; background-color: #fee2e2; color: #991b1b; }
+
+/* ==========================================
+   完美离线打印导出指令 (导出PDF必用)
+   ========================================== */
+@media print {
+    @page { size: landscape; margin: 0; }
+    body { background-color: #ffffff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; overflow: visible !important; height: auto !important; padding: 0;}
+    .slide-container { 
+        display: flex !important; 
+        flex-direction: column !important;
+        height: 100vh !important; 
+        width: 100vw !important;
+        page-break-after: always !important; 
+        break-after: page !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+    }
+}
     </style>
 </head>
-<body>
+<body contenteditable="true">
 
-    <!-- Slide 1: Cover -->
-    <div class="slide active" id="slide-1">
-        <div class="flex-1 flex flex-col items-center justify-center text-center">
-            <div class="inline-block px-4 py-1 rounded-full bg-blue-900/50 text-blue-300 border border-blue-500/30 mb-6 text-sm font-semibold tracking-widest">
-                智能汇报文档
+<div class="slide-container" id="slide1" style="justify-content: center; align-items: center; text-align: center;">
+    <div style="background-color: #2563eb; width: 60px; height: 60px; border-radius: 12px; margin-bottom: 30px; display: flex; align-items: center; justify-content: center;">
+        <i class="fa-solid fa-chart-line text-white" style="font-size: 30px;"></i>
+    </div>
+    <h1 style="color: #1e3a8a;">二线外呼全链路智能优化方案</h1>
+    <div style="width: 100px; height: 4px; background-color: #2563eb; margin: 30px auto;"></div>
+    <p style="font-size: 24px; color: #64748b; font-weight: 500;">提升接通率与工单处理效能的智能化闭环策略</p>
+</div>
+
+<div class="slide-container" id="slide2">
+    <h2 class="slide-title">一、项目背景：工单单量结构拆解</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div class="box-card" style="border-top: 4px solid #ef4444;">
+                <p style="font-weight: 700; color: #ef4444; font-size: 20px;">需外呼处理工单</p>
+                <div class="big-number">4,300<span style="font-size: 20px; color: #64748b;"> 单/日</span></div>
+                <div style="margin-top: 20px;">
+                    <p><i class="fa-solid fa-users text-slate-400 mr-2"></i> 投入人力：<strong>122 人</strong></p>
+                    <p><i class="fa-solid fa-triangle-exclamation text-slate-400 mr-2"></i> 现状：链路长、耗时多、人力消耗极大</p>
+                </div>
             </div>
-            <h1 class="text-6xl font-extrabold mb-6 tracking-tight">
-                二线外呼全链路 <span class="gradient-text">智能优化方案</span>
-            </h1>
-            <p class="text-2xl text-slate-400 mb-12 max-w-3xl leading-relaxed">
-                针对接通率瓶颈与人工耗时痛点，构建“预约-派单-推荐-外呼-操作-归档”的六步智能化闭环。
+            <div class="box-card" style="border-top: 4px solid #10b981;">
+                <p style="font-weight: 700; color: #10b981; font-size: 20px;">可快速解决工单</p>
+                <div class="big-number" style="color: #10b981;">1,200<span style="font-size: 20px; color: #64748b;"> 单/日</span></div>
+                <div style="margin-top: 20px;">
+                    <p><i class="fa-solid fa-users text-slate-400 mr-2"></i> 投入人力：<strong>15 人</strong></p>
+                    <p><i class="fa-solid fa-check-double text-slate-400 mr-2"></i> 现状：已实现高标准自动化流转</p>
+                </div>
+            </div>
+        </div>
+        <div style="background-color: #f1f5f9; padding: 20px; border-radius: 8px; margin-top: 30px;">
+            <p style="margin: 0; font-weight: 700; text-align: center; color: #1e3a8a;">
+                重点突破：日均 5,500 单中，外呼件占比 <span style="color: #ef4444;">78%</span>，是全链路提效的“核心战场”
             </p>
-            <div class="flex space-x-4">
-                <div class="px-6 py-3 glass-card flex items-center space-x-3">
-                    <i class="fa-solid fa-phone-volume text-cyan-400"></i>
-                    <span>接通率提升突破</span>
-                </div>
-                <div class="px-6 py-3 glass-card flex items-center space-x-3">
-                    <i class="fa-solid fa-microchip text-indigo-400"></i>
-                    <span>人机协同提效</span>
-                </div>
-                <div class="px-6 py-3 glass-card flex items-center space-x-3">
-                    <i class="fa-solid fa-bolt text-yellow-400"></i>
-                    <span>自动化闭环归档</span>
-                </div>
+        </div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide3">
+    <h2 class="slide-title">一、项目背景：外呼单均耗时瓶颈</h2>
+    <div class="content-area">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <p style="font-size: 22px; font-weight: 700;">传统人工模式下单均总耗时：<span style="color: #b45309;">12 分钟</span></p>
+            <div style="display: flex; height: 45px; border-radius: 6px; overflow: hidden; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <div style="background-color: #3b82f6; width: 25%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px;">查询 (3min)</div>
+                <div style="background-color: #1e3a8a; width: 42%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px;">核心外呼 (5min)</div>
+                <div style="background-color: #10b981; width: 8%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px;">操作 (1min)</div>
+                <div style="background-color: #f59e0b; width: 25%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px;">归档 (3min)</div>
+            </div>
+        </div>
+        <div class="two-column">
+            <div class="box-card">
+                <h3 style="font-size: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 20px;">数据发现：60% 为非沟通耗时</h3>
+                <p>除去核心外呼沟通的5分钟外，<strong>查询、操作、归档</strong> 累计耗时达 <span style="color: #ef4444; font-weight: 700;">7分钟</span>。</p>
+                <p>这意味着员工 60% 的时间在处理非增值事务，通过智能化改造空间极大。</p>
+            </div>
+            <div class="box-card">
+                <h3 style="font-size: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 20px;">智能化切入逻辑</h3>
+                <ul style="padding-left: 20px;">
+                    <li style="margin-bottom: 10px;"><strong>查询智能化：</strong> 系统自动组装外呼准备单</li>
+                    <li style="margin-bottom: 10px;"><strong>操作智能化：</strong> 一键触发平台服务体验金/尝试开启售后入口</li>
+                    <li><strong>归档智能化：</strong> 自动生成备注，极速结单</li>
+                </ul>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Slide 2: Background - Structure -->
-    <div class="slide" id="slide-2">
-        <div class="mb-8">
-            <h2 class="text-3xl font-bold mb-2">一、为什么做行业智能化？</h2>
-            <p class="text-slate-400">痛点剖析：工单结构拆解与人力消耗分布</p>
+<div class="slide-container" id="slide4">
+    <h2 class="slide-title">二、试点选型：数据驱动与场景特征透视</h2>
+    <div class="content-area">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 15%;">行业维度</th>
+                    <th style="width: 12%;">日均升级量</th>
+                    <th style="width: 10%;">和解率</th>
+                    <th style="width: 12%;">平均通话</th>
+                    <th style="width: 38%;">类目特征</th>
+                    <th style="width: 13%;">适合度</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="highlight-blue">
+                    <td><i class="fa-solid fa-shirt text-blue-600 mr-2"></i>衣帽箱包</td>
+                    <td>1,560</td>
+                    <td>84%</td>
+                    <td>228s</td>
+                    <td>诉求明确（尺码/颜色/质量）</td>
+                    <td style="color: #f59e0b;">★★★★★ 首选</td>
+                </tr>
+                <tr>
+                    <td>食品生鲜</td>
+                    <td>400</td>
+                    <td>-</td>
+                    <td>230s</td>
+                    <td>主观性强（保质期/感官）</td>
+                    <td style="color: #94a3b8;">★★★</td>
+                </tr>
+                <tr>
+                    <td>普通综合</td>
+                    <td>409</td>
+                    <td>-</td>
+                    <td>260s</td>
+                    <td>需技术判断（功能/兼容性）</td>
+                    <td style="color: #94a3b8;">★★★</td>
+                </tr>
+                <tr>
+                    <td>3C数码</td>
+                    <td>121</td>
+                    <td>-</td>
+                    <td>257s</td>
+                    <td>极高主观性（真假/价值评估）</td>
+                    <td style="color: #ef4444; font-weight: 700;">不适合</td>
+                </tr>
+                <tr>
+                    <td>珠宝文玩</td>
+                    <td>51</td>
+                    <td>-</td>
+                    <td>300s</td>
+                    <td>真假鉴定难（依赖专业机构）</td>
+                    <td style="color: #ef4444; font-weight: 700;">不适合</td>
+                </tr>
+                <tr>
+                    <td>虚拟产品</td>
+                    <td>46</td>
+                    <td>-</td>
+                    <td>215s</td>
+                    <td>课程/会员/充值类（举证困难）</td>
+                    <td style="color: #ef4444; font-weight: 700;">不适合</td>
+                </tr>
+                <tr>
+                    <td>美妆母婴</td>
+                    <td>112</td>
+                    <td>-</td>
+                    <td>220s</td>
+                    <td>过敏/不适（因果关系难界定）</td>
+                    <td style="color: #ef4444; font-weight: 700;">不适合</td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="margin-top: 15px; border-left: 4px solid #2563eb; padding-left: 20px; background-color: #f8fafc; padding: 15px; border-radius: 4px;">
+            <p style="margin: 0;"><strong>战略决策：</strong> 相比于依赖主观判定与专业鉴定的类目，<strong style="color: #1e3a8a;">衣帽箱包</strong> 具备“诉求标签清晰、流转链路短、高和解率”三大优势，是验证智能化闭环的最佳土壤。</p>
         </div>
-        <div class="flex-1 flex items-center justify-center">
-            <div class="w-full max-w-5xl glass-card p-10 flex flex-col relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
-                
-                <div class="text-center mb-10 relative z-10">
-                    <div class="text-xl text-slate-300 mb-2">日均升级总工单量</div>
-                    <div class="text-6xl font-bold text-white tracking-wider">5,500 <span class="text-2xl text-slate-400 font-normal">单</span></div>
+    </div>
+</div>
+
+<div class="slide-container" id="slide_overview">
+    <h2 class="slide-title">全链路闭环：智能化六步概览与总结</h2>
+    <div class="content-area">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; height: 100%;">
+            <!-- 1. 智能预约 -->
+            <div class="box-card" style="padding: 25px; display: flex; flex-direction: column;">
+                <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                    <div style="background-color: #2563eb; color: white; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; margin-right: 15px;">1</div>
+                    <h3 style="margin: 0; font-size: 20px; color: #1e3a8a;">智能预约</h3>
                 </div>
-
-                <div class="flex justify-between items-stretch gap-8 relative z-10">
-                    <div class="flex-1 bg-slate-800/80 rounded-xl p-8 border-t-4 border-cyan-500 relative">
-                        <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
-                            核心提效战场
-                        </div>
-                        <h3 class="text-2xl font-bold mb-4 text-center">需外呼处理工单</h3>
-                        <div class="text-5xl font-black text-cyan-400 text-center mb-6">4,300 <span class="text-xl font-normal text-slate-300">单</span></div>
-                        <div class="bg-slate-900 rounded-lg p-4 flex items-center justify-between">
-                            <span class="text-slate-400"><i class="fa-solid fa-users mr-2"></i>日均人力需求</span>
-                            <span class="text-2xl font-bold text-red-400">122 人</span>
-                        </div>
-                        <p class="text-sm text-slate-500 mt-4 text-center">耗费绝大部分人力，急需智能化改造介入</p>
-                    </div>
-
-                    <div class="w-12 flex items-center justify-center">
-                        <div class="w-0.5 h-full bg-slate-700"></div>
-                    </div>
-
-                    <div class="flex-1 bg-slate-800/80 rounded-xl p-8 border-t-4 border-emerald-500">
-                        <h3 class="text-2xl font-bold mb-4 text-center">可快速赔付工单</h3>
-                        <div class="text-5xl font-black text-emerald-400 text-center mb-6">1,200 <span class="text-xl font-normal text-slate-300">单</span></div>
-                        <div class="bg-slate-900 rounded-lg p-4 flex items-center justify-between">
-                            <span class="text-slate-400"><i class="fa-solid fa-user-check mr-2"></i>日均人力需求</span>
-                            <span class="text-2xl font-bold text-emerald-300">15 人</span>
-                        </div>
-                        <p class="text-sm text-slate-500 mt-4 text-center">流程简单短平快，无需重度介入</p>
-                    </div>
+                <p style="font-size: 14px; line-height: 1.6; color: #475569; margin: 0;"><strong>现状：</strong>针对升级工单问题，人工外呼接通率只有 <span style="color: #ef4444; font-weight: 700;">65%</span>。未接通一方面会影响人工处理效率（每单处理需花费 3min），另外未接通用户再次来单率达 <span style="color: #ef4444; font-weight: 700;">**%</span>，造成服务资源浪费。</p>
+            </div>
+            <!-- 2. 智能派单 -->
+            <div class="box-card" style="padding: 25px; display: flex; flex-direction: column;">
+                <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                    <div style="background-color: #2563eb; color: white; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; margin-right: 15px;">2</div>
+                    <h3 style="margin: 0; font-size: 20px; color: #1e3a8a;">智能派单</h3>
                 </div>
+                <p style="font-size: 14px; line-height: 1.6; color: #475569; margin: 0;">基于我们的智能预约能力紧密联动派单：<br>1、首先区分各时间段内人员的承接能力；<br>2、派单的逻辑为 <strong style="color: #1e3a8a;">风控 ＞ 超时 ＞ 催办 ＞ 普通</strong>。</p>
+            </div>
+            <!-- 3. 智能推荐 -->
+            <div class="box-card" style="padding: 25px; display: flex; flex-direction: column;">
+                <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                    <div style="background-color: #2563eb; color: white; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; margin-right: 15px;">3</div>
+                    <h3 style="margin: 0; font-size: 20px; color: #1e3a8a;">智能推荐</h3>
+                </div>
+                <p style="font-size: 14px; line-height: 1.6; color: #475569; margin: 0;">员工收到工单后会根据工单信息，智能查询辅助，并且直接输出<strong>工单处理方案</strong>。</p>
+            </div>
+            <!-- 4. 外呼沟通 -->
+            <div class="box-card" style="padding: 25px; display: flex; flex-direction: column;">
+                <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                    <div style="background-color: #2563eb; color: white; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; margin-right: 15px;">4</div>
+                    <h3 style="margin: 0; font-size: 20px; color: #1e3a8a;">外呼沟通</h3>
+                </div>
+                <p style="font-size: 13px; line-height: 1.6; color: #475569; margin: 0;">通过前期的预约派单查询工作，我们将外呼分为智能及人工。基于现有智能外呼能力（简单的规则解释、基础按键交互），我们通过用户问题、关键查询结果、服务方案推送，将<strong style="color: #1e3a8a;">查询退款进度、催促售后进度、极速退款咨询</strong>做智能外呼试点。</p>
+            </div>
+            <!-- 5. 智能操作 -->
+            <div class="box-card" style="padding: 25px; display: flex; flex-direction: column;">
+                <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                    <div style="background-color: #2563eb; color: white; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; margin-right: 15px;">5</div>
+                    <h3 style="margin: 0; font-size: 20px; color: #1e3a8a;">智能操作</h3>
+                </div>
+                <p style="font-size: 14px; line-height: 1.6; color: #475569; margin: 0;">通过外呼与用户交互确认方案（包含<strong style="color: #1e3a8a;">平台服务体验金、尝试开启售后入口、砍单</strong>），实现系统智能操作归档。</p>
+            </div>
+            <!-- 6. 智能归档 -->
+            <div class="box-card" style="padding: 25px; display: flex; flex-direction: column;">
+                <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                    <div style="background-color: #2563eb; color: white; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; margin-right: 15px;">6</div>
+                    <h3 style="margin: 0; font-size: 20px; color: #1e3a8a;">智能归档</h3>
+                </div>
+                <p style="font-size: 14px; line-height: 1.6; color: #475569; margin: 0;">最后通过整个工单处理链路总结生成工单备注内容，进行工单闭环归档。</p>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Slide 3: Background - Time Breakdown -->
-    <div class="slide" id="slide-3">
-        <div class="mb-8">
-            <h2 class="text-3xl font-bold mb-2">一、为什么做行业智能化？</h2>
-            <p class="text-slate-400">耗时拆解：外呼以外的沉没成本</p>
-        </div>
-        <div class="flex-1 flex flex-col justify-center items-center">
-            <div class="w-full max-w-5xl glass-card p-8 mb-6">
-                <h3 class="text-xl font-bold mb-6 text-center">人工处理单均总耗时：<span class="text-4xl text-yellow-400 ml-2">12 分钟</span></h3>
-                
-                <div class="flex w-full h-16 rounded-full overflow-hidden mb-6 shadow-lg shadow-black/50">
-                    <div class="bg-blue-600 flex items-center justify-center text-sm font-bold w-[25%]" title="查询信息 3min">
-                        查询信息 (3m)
+<div class="slide-container" id="slide5">
+    <h2 class="slide-title">第一步：智能预约（破解 65% 接通率）</h2>
+    <div class="content-area">
+        <div style="display: grid; grid-template-columns: 4fr 6fr; gap: 40px; height: 100%;">
+            <!-- 左侧：模式选型 -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <h3 style="font-size: 20px; color: #1e3a8a; margin-bottom: 10px;">预约模式选型</h3>
+
+                <!-- 选项 A -->
+                <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; opacity: 0.7;">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #cbd5e1; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 10px; font-weight: bold;">A</div>
+                        <span style="font-weight: 700; color: #64748b; font-size: 18px;">弹窗式 (IMC预设)</span>
                     </div>
-                    <div class="bg-emerald-500 flex items-center justify-center text-sm font-bold w-[42%]" title="外呼沟通 5min">
-                        <i class="fa-solid fa-phone mr-2"></i> 外呼沟通 (5m)
-                    </div>
-                    <div class="bg-purple-600 flex items-center justify-center text-sm font-bold w-[8%]" title="执行操作 1min">
-                        操作(1m)
-                    </div>
-                    <div class="bg-orange-500 flex items-center justify-center text-sm font-bold w-[25%]" title="归档备注 3min">
-                        归档备注 (3m)
-                    </div>
+                    <p style="font-size: 14px; color: #94a3b8; margin: 0; padding-left: 34px;">系统弹出时间选项卡供用户点选，较为被动。</p>
                 </div>
 
-                <div class="flex justify-between px-4 text-sm text-slate-400">
-                    <div class="text-left w-[25%]">① 阅览历史工单与标签</div>
-                    <div class="text-center w-[42%] text-white font-bold">② 核心交互环节</div>
-                    <div class="text-center w-[8%]">③ 赔付/砍单</div>
-                    <div class="text-right w-[25%]">④ 写备注与结单</div>
-                </div>
-            </div>
-
-            <div class="flex w-full max-w-5xl gap-6">
-                <div class="glass-card p-6 flex-1 border-l-4 border-red-500">
-                    <div class="text-red-400 text-lg font-bold mb-2"><i class="fa-solid fa-triangle-exclamation mr-2"></i>核心痛点发现</div>
-                    <p class="text-slate-300 leading-relaxed text-lg">
-                        在12分钟的链路中，除外呼本身的5分钟外，<strong class="text-white">查询(3m) + 操作(1m) + 归档(3m) 合计花费 7 分钟</strong>。
-                    </p>
-                </div>
-                <div class="glass-card p-6 flex-1 bg-gradient-to-r from-blue-900/50 to-indigo-900/50 border-none">
-                    <div class="text-cyan-400 text-lg font-bold mb-2"><i class="fa-solid fa-lightbulb mr-2"></i>破局思路</div>
-                    <p class="text-slate-300 leading-relaxed text-lg">
-                        非沟通耗时占比高达 <strong class="text-3xl text-white ml-1">60%</strong>。这正是<span class="text-cyan-300 mx-1">系统自动化</span>与<span class="text-indigo-300 mx-1">AI智能化</span>最容易切入并产生巨大提效的环节。
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Slide 4: Industry Selection -->
-    <div class="slide" id="slide-4">
-        <div class="mb-6">
-            <h2 class="text-3xl font-bold mb-2">二、试点行业选型推导</h2>
-            <p class="text-slate-400">多维评估：寻找最佳智能化试验田</p>
-        </div>
-        <div class="flex-1 flex flex-col justify-center">
-            <div class="glass-card overflow-hidden">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-800 text-slate-300 text-sm uppercase tracking-wider">
-                            <th class="p-4 border-b border-slate-700">行业</th>
-                            <th class="p-4 border-b border-slate-700">日均升级量</th>
-                            <th class="p-4 border-b border-slate-700">和解率</th>
-                            <th class="p-4 border-b border-slate-700">平均通话时长</th>
-                            <th class="p-4 border-b border-slate-700">金额占比</th>
-                            <th class="p-4 border-b border-slate-700">难度评级</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-slate-200">
-                        <tr class="bg-emerald-900/40 border-l-4 border-emerald-500 shadow-inner">
-                            <td class="p-4 border-b border-slate-700 font-bold text-emerald-300"><i class="fa-solid fa-shirt mr-2"></i>衣帽箱包</td>
-                            <td class="p-4 border-b border-slate-700 font-bold">1,560</td>
-                            <td class="p-4 border-b border-slate-700 font-bold">84%</td>
-                            <td class="p-4 border-b border-slate-700 font-bold text-emerald-300">228s</td>
-                            <td class="p-4 border-b border-slate-700 font-bold">8.7%</td>
-                            <td class="p-4 border-b border-slate-700 font-bold text-emerald-400">易</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4 border-b border-slate-800">食品生鲜</td>
-                            <td class="p-4 border-b border-slate-800">400</td>
-                            <td class="p-4 border-b border-slate-800 text-slate-500">-</td>
-                            <td class="p-4 border-b border-slate-800">230s</td>
-                            <td class="p-4 border-b border-slate-800 text-slate-500">-</td>
-                            <td class="p-4 border-b border-slate-800 text-emerald-400">易</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4 border-b border-slate-800">普通综合</td>
-                            <td class="p-4 border-b border-slate-800">409</td>
-                            <td class="p-4 border-b border-slate-800 text-slate-500">-</td>
-                            <td class="p-4 border-b border-slate-800 text-red-300">260s</td>
-                            <td class="p-4 border-b border-slate-800 text-slate-500">-</td>
-                            <td class="p-4 border-b border-slate-800 text-red-400">难</td>
-                        </tr>
-                        <tr class="bg-slate-800/50">
-                            <td class="p-4 border-b border-slate-800">3C数码</td>
-                            <td class="p-4 border-b border-slate-800">121</td>
-                            <td class="p-4 border-b border-slate-800 text-slate-500">-</td>
-                            <td class="p-4 border-b border-slate-800 text-red-300">257s</td>
-                            <td class="p-4 border-b border-slate-800 text-slate-500">-</td>
-                            <td class="p-4 border-b border-slate-800 text-red-400">难</td>
-                        </tr>
-                        <tr>
-                            <td class="p-4 border-b border-slate-800">珠宝文玩</td>
-                            <td class="p-4 border-b border-slate-800">51</td>
-                            <td class="p-4 border-b border-slate-800 text-slate-500">-</td>
-                            <td class="p-4 border-b border-slate-800 text-red-400">300s</td>
-                            <td class="p-4 border-b border-slate-800 text-slate-500">-</td>
-                            <td class="p-4 border-b border-slate-800 text-red-400">难</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="mt-6 flex items-center bg-cyan-900/30 p-4 rounded-lg border border-cyan-800">
-                <i class="fa-solid fa-bullseye text-3xl text-cyan-400 mr-4"></i>
-                <div>
-                    <h4 class="text-lg font-bold text-cyan-300">战略决策结论</h4>
-                    <p class="text-sm text-slate-300 mt-1">综合日升级量（覆盖面大）、和解率（成功率高）、通话时长（沟通成本低）等指标，最终选定 <strong class="text-white">衣帽箱包</strong> 行业作为智能化试点起点，具备极佳的示范效应。</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Slide 5: Step 1 - Reservation -->
-    <div class="slide" id="slide-5">
-        <div class="mb-4 shrink-0">
-            <h2 class="text-3xl font-bold mb-2">第一步：智能预约</h2>
-            <p class="text-slate-400">破局 65% 接通率：从“盲呼”到“预约锁定”</p>
-        </div>
-        
-        <div class="flex-1 flex gap-8 items-center justify-center pb-8">
-            <!-- Left Panel -->
-            <div class="w-1/2 glass-card p-8 h-full flex flex-col justify-center relative overflow-hidden">
-                <div class="absolute top-0 right-0 bg-indigo-500 text-xs px-3 py-1 rounded-bl-lg font-bold">交互方案对比</div>
-                <h3 class="text-xl font-bold mb-6 text-white border-b border-slate-700 pb-2">预约模式选型</h3>
-                
-                <div class="space-y-6">
-                    <div class="opacity-50 grayscale transition-all duration-300">
-                        <div class="flex items-center mb-2">
-                            <span class="w-6 h-6 rounded-full bg-slate-600 flex items-center justify-center text-xs mr-3">A</span>
-                            <h4 class="font-bold text-lg">弹窗式 (IMC预设)</h4>
-                        </div>
-                        <p class="text-sm text-slate-400 pl-9">系统弹出时间选项卡供用户点选，较为被动。</p>
+                <!-- 选项 B (Active) -->
+                <div style="background-color: #eff6ff; border: 2px solid #2563eb; border-radius: 8px; padding: 20px; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.1);">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #2563eb; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 10px;"><i class="fa-solid fa-check"></i></div>
+                        <span style="font-weight: 700; color: #1e3a8a; font-size: 18px;">交互式 (人工/AI询问) —— 当前选中方案</span>
                     </div>
-                    
-                    <div class="bg-indigo-900/40 p-5 rounded-lg border border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                        <div class="flex items-center mb-2">
-                            <span class="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs mr-3"><i class="fa-solid fa-check"></i></span>
-                            <h4 class="font-bold text-lg text-indigo-300">交互式 (人工/AI询问) —— <span class="text-white">当前选中方案</span></h4>
-                        </div>
-                        <p class="text-sm text-slate-300 pl-9 mb-3">通过对话交互自然询问，引导用户选择回访时间，体验更好且转化率更高。</p>
-                        <div class="pl-9 text-xs text-indigo-400 bg-black/20 p-2 rounded">
-                            <i class="fa-solid fa-comment-dots mr-2"></i> "先生您好，为了更好地帮您解决退款问题，请问今天下午3点还是晚上8点方便我们专员给您回电呢？"
-                        </div>
+                    <p style="font-size: 14px; color: #334155; margin-bottom: 15px; padding-left: 34px;">通过对话交互自然询问，引导用户选择回访时间，体验更好且转化率更高。</p>
+                    <div style="background-color: #dbeafe; padding: 12px 15px; border-radius: 6px; margin-left: 34px;">
+                        <p style="font-style: italic; color: #1e40af; font-size: 13px; margin: 0;"><i class="fa-solid fa-comment-dots mr-2"></i>"先生您好，为了更好地帮您解决退款问题，请问今天下午3点还是晚上8点方便我们专员给您回电呢？"</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Panel -->
-            <div class="w-1/2 glass-card p-8 h-full flex flex-col justify-center">
-                <h3 class="text-xl font-bold mb-6 text-white flex items-center border-b border-slate-700 pb-2">
-                    <i class="fa-regular fa-calendar-check text-cyan-400 mr-3"></i> 当日各时段预约看板 (Mockup)
+            <!-- 右侧：时段看板 -->
+            <div class="box-card" style="padding: 30px; display: flex; flex-direction: column; justify-content: center;">
+                <h3 style="font-size: 20px; color: #1e3a8a; margin-bottom: 25px; display: flex; align-items: center;">
+                    <i class="fa-regular fa-calendar-check text-blue-600 mr-2"></i> 当日各时段预约看板 (Mockup)
                 </h3>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="col-span-2 text-sm font-bold text-slate-400 mt-2">早盘时段</div>
-                    <div class="bg-slate-800 rounded p-3 flex justify-between items-center border-l-4 border-slate-600">
-                        <span class="text-slate-300">09:00 - 11:00</span>
-                        <span class="bg-slate-700 px-2 py-1 rounded text-xs">剩余: 12</span>
-                    </div>
-                    <div class="bg-slate-800 rounded p-3 flex justify-between items-center border-l-4 border-slate-600">
-                        <span class="text-slate-300">11:00 - 13:00</span>
-                        <span class="bg-slate-700 px-2 py-1 rounded text-xs">剩余: 5</span>
-                    </div>
 
-                    <div class="col-span-2 text-sm font-bold text-slate-400 mt-2">午盘时段</div>
-                    <div class="bg-slate-800 rounded p-3 flex justify-between items-center border-l-4 border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
-                        <span class="text-cyan-300 font-bold">13:00 - 15:00</span>
-                        <span class="bg-cyan-900/80 text-cyan-300 px-2 py-1 rounded text-xs border border-cyan-700">剩余: 45</span>
+                <!-- 早盘 -->
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 14px; font-weight: 700; color: #64748b; margin-bottom: 10px;">早盘时段</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div style="background-color: #f1f5f9; padding: 12px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #475569; font-size: 14px;">09:00 - 11:00</span>
+                            <span style="background-color: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">剩余: 12</span>
+                        </div>
+                        <div style="background-color: #f1f5f9; padding: 12px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #475569; font-size: 14px;">11:00 - 13:00</span>
+                            <span style="background-color: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">剩余: 5</span>
+                        </div>
                     </div>
-                    <div class="bg-slate-800 rounded p-3 flex justify-between items-center border-l-4 border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.2)]">
-                        <span class="text-cyan-300 font-bold">15:00 - 17:00</span>
-                        <span class="bg-cyan-900/80 text-cyan-300 px-2 py-1 rounded text-xs border border-cyan-700">剩余: 38</span>
-                    </div>
-                    <div class="bg-slate-800 rounded p-3 flex justify-between items-center border-l-4 border-slate-600">
-                        <span class="text-slate-300">17:00 - 19:00</span>
-                        <span class="bg-slate-700 px-2 py-1 rounded text-xs">剩余: 19</span>
-                    </div>
+                </div>
 
-                    <div class="col-span-2 text-sm font-bold text-slate-400 mt-2">晚盘时段</div>
-                    <div class="bg-slate-800 rounded p-3 flex justify-between items-center border-l-4 border-indigo-500 col-span-2 shadow-[0_0_10px_rgba(99,102,241,0.2)]">
-                        <span class="text-indigo-300 font-bold">19:00 - 22:00</span>
-                        <span class="bg-indigo-900/80 text-indigo-300 px-2 py-1 rounded text-xs border border-indigo-700">剩余: 86 (高并发区)</span>
+                <!-- 午盘 -->
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 14px; font-weight: 700; color: #64748b; margin-bottom: 10px;">午盘时段</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #1e3a8a; font-size: 14px; font-weight: 700;">13:00 - 15:00</span>
+                            <span style="background-color: #bfdbfe; color: #1d4ed8; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">剩余: 45</span>
+                        </div>
+                        <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #1e3a8a; font-size: 14px; font-weight: 700;">15:00 - 17:00</span>
+                            <span style="background-color: #bfdbfe; color: #1d4ed8; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">剩余: 38</span>
+                        </div>
+                        <div style="background-color: #f1f5f9; padding: 12px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #475569; font-size: 14px;">17:00 - 19:00</span>
+                            <span style="background-color: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">剩余: 19</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 晚盘 -->
+                <div>
+                    <div style="font-size: 14px; font-weight: 700; color: #64748b; margin-bottom: 10px;">晚盘时段</div>
+                    <div style="background-color: #fdf2f8; border-left: 4px solid #e11d48; padding: 12px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #9f1239; font-size: 14px; font-weight: 700;">19:00 - 22:00</span>
+                        <span style="background-color: #fecdd3; color: #9f1239; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">剩余: 86 (高并发区)</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Slide 6: Step 2 - Dispatch -->
-    <div class="slide" id="slide-6">
-        <div class="mb-8 shrink-0">
-            <h2 class="text-3xl font-bold mb-2">第二步：智能派单</h2>
-            <p class="text-slate-400">紧密联动：将合适的时间、急迫的工单交给匹配的人</p>
-        </div>
-        
-        <div class="flex-1 flex items-center justify-center w-full">
-            <div class="w-full max-w-4xl bg-slate-800/80 rounded-2xl p-8 border border-slate-700 relative overflow-hidden shadow-2xl">
-                <div class="absolute -right-20 -top-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
-                
-                <div class="flex flex-col md:flex-row items-center gap-10">
-                    <!-- Left Logic -->
-                    <div class="flex-1 space-y-6">
-                        <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-700 relative">
-                            <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center font-bold text-xs shadow-lg shadow-cyan-500/50">1</div>
-                            <h4 class="text-lg font-bold mb-2 text-cyan-300">动态承接能力评估</h4>
-                            <p class="text-sm text-slate-400">实时拉取各业务组在班人力与预估处理时效，结合前端【预约回访时段】单池，计算各个时段的人机吞吐量阈值。</p>
-                        </div>
-                        
-                        <div class="flex justify-center text-slate-500"><i class="fa-solid fa-arrow-down fa-lg"></i></div>
-
-                        <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-700 relative">
-                            <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center font-bold text-xs shadow-lg shadow-indigo-500/50">2</div>
-                            <h4 class="text-lg font-bold mb-2 text-indigo-300">四级工单漏斗路由</h4>
-                            <p class="text-sm text-slate-400">满足承接能力前提下，严格执行派单优先级排序，确保高危易发酵工单被优先秒级触达。</p>
-                        </div>
-                    </div>
-
-                    <!-- Right Funnel -->
-                    <div class="flex-1">
-                        <h4 class="text-center font-bold text-slate-300 mb-6 tracking-widest">派单优先级执行逻辑</h4>
-                        <div class="space-y-3 relative flex flex-col items-center">
-                            <div class="w-full bg-red-900/40 border border-red-500 text-red-400 py-3 rounded text-center font-bold shadow-[0_0_15px_rgba(239,68,68,0.2)]">
-                                级别 1：风控用户 (最高优)
-                            </div>
-                            <div class="w-11/12 bg-orange-900/40 border border-orange-500 text-orange-400 py-3 rounded text-center font-bold">
-                                级别 2：超时临期
-                            </div>
-                            <div class="w-10/12 bg-yellow-900/40 border border-yellow-500 text-yellow-400 py-3 rounded text-center font-bold">
-                                级别 3：多次催办
-                            </div>
-                            <div class="w-3/4 bg-slate-700 border border-slate-500 text-slate-300 py-3 rounded text-center font-bold">
-                                级别 4：普通工单
-                            </div>
-                        </div>
-                    </div>
+<div class="slide-container" id="slide7">
+    <h2 class="slide-title">第二步：智能派单（联动人力与时段）</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div class="box-card">
+                <h3>2.1 承接能力评估</h3>
+                <p>派单系统实时联动“预约看板”与“坐席在班人力”。</p>
+                <p>根据各时段预计处理效能，合理分派单量，杜绝“预约时间到了却无人外呼”的风险。</p>
+            </div>
+            <div class="box-card">
+                <h3>2.2 派单优先级矩阵</h3>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="background-color: #fee2e2; border-left: 4px solid #ef4444; padding: 10px 15px; font-weight: 700;">1. 风控用户类 (Level 0)</div>
+                    <div style="background-color: #ffedd5; border-left: 4px solid #f59e0b; padding: 10px 15px; font-weight: 700;">2. 超时预警单 (Level 1)</div>
+                    <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 10px 15px; font-weight: 700;">3. 多次催办单 (Level 2)</div>
+                    <div style="background-color: #f1f5f9; border-left: 4px solid #94a3b8; padding: 10px 15px; font-weight: 700;">4. 普通工单 (Level 3)</div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Slide 7: Step 3 - Recommendation -->
-    <div class="slide" id="slide-7">
-        <div class="mb-4 shrink-0">
-            <h2 class="text-3xl font-bold mb-2">第三步：智能推荐</h2>
-            <p class="text-slate-400">将3分钟的手工查阅与思考，压缩至系统级1秒呈现</p>
-        </div>
-        
-        <div class="flex-1 flex justify-center items-center pb-6">
-            <div class="w-full max-w-3xl bg-slate-50 text-slate-800 rounded-lg shadow-2xl overflow-hidden border border-slate-300 font-sans transform hover:scale-[1.02] transition-transform">
-                <!-- Header -->
-                <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
-                    <div class="font-bold flex items-center"><i class="fa-solid fa-robot text-cyan-400 mr-2"></i>【AI 外呼准备单】</div>
-                    <div class="text-sm font-mono bg-slate-700 px-2 py-1 rounded">工单 #260000*******</div>
+<div class="slide-container" id="slide8">
+    <h2 class="slide-title">第三步：智能推荐（外呼准备单示例）</h2>
+    <div class="content-area">
+        <div class="ticket-mockup">
+            <div class="ticket-header">【AI外呼准备单】工单 #260000*******</div>
+            <div class="ticket-body">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                    <p><strong>用户画像：</strong> 先生/女士 <span class="label-tag">老年人/风险评估</span></p>
+                    <p><strong>历史数据：</strong> 平台服务体验金记录2次 | 判责2次 | 投诉1次</p>
                 </div>
-                
-                <!-- Content -->
-                <div class="p-6">
-                    <!-- User Tags -->
-                    <div class="flex flex-wrap gap-2 mb-4 text-xs font-bold">
-                        <span class="bg-slate-200 px-2 py-1 rounded text-slate-700">先生/女士</span>
-                        <span class="bg-red-100 text-red-600 px-2 py-1 rounded border border-red-200">老年人/风控用户</span>
-                        <span class="bg-orange-100 text-orange-600 px-2 py-1 rounded">历史投诉: 1次(已解决)</span>
-                        <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded">历史赔付记录: 2次</span>
-                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded">历史判责: 2次(自营客责)</span>
-                    </div>
+                <p><strong>当前情绪：</strong> <span style="color: #991b1b; font-weight: 700;">低风险，但反复强调“失望”</span></p>
+                <div style="background-color: #f1f5f9; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                    <p style="font-weight: 700; color: #1e3a8a; margin-bottom: 5px;">建议方案（已匹配最高权限）：</p>
+                    <p>1. 优先执行“平台服务体验金”安抚；2. 若用户不接受，执行兜底方案。</p>
+                </div>
+                <p style="color: #991b1b; font-weight: 700; font-size: 14px;">❌ 话术红线拦截：严禁说“这是规定”、“我不管商家”、“自己去联系”。</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-                    <div class="mb-4 flex items-center bg-red-50 p-3 rounded-lg border border-red-100">
-                        <i class="fa-solid fa-heart-pulse text-red-500 mr-3 text-xl"></i>
-                        <div>
-                            <div class="text-xs text-slate-500 font-bold uppercase tracking-wider">实时情绪评估</div>
-                            <div class="font-bold text-red-700">低风险，但交互记录反复强调“失望”</div>
-                        </div>
-                    </div>
+<div class="slide-container" id="slide9">
+    <h2 class="slide-title">第四步：人机分流（基于数据洞察）</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div class="box-card">
+                <h3 style="color: #2563eb;">场景 A：智能外呼试点</h3>
+                <p><strong>适用场景：</strong> 退款进度查询、催促售后进度、极速退款咨询</p>
+                <p><strong>逻辑：</strong> 基于标准化规则解释与按键交互，AI自动处理高频、低复杂度诉求。</p>
+            </div>
+            <div class="box-card">
+                <h3 style="color: #1e3a8a;">场景 B：人工深度外呼</h3>
+                <p><strong>适用场景：</strong> 复杂谈判、高危风控用户安抚</p>
+                <p><strong>逻辑：</strong> 针对调研中发现的“人工介入可显著提升解决率”的情绪场景，交由专家坐席承接。</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-                    <!-- Details Grid -->
-                    <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
-                        <div class="bg-slate-100 p-3 rounded border border-slate-200">
-                            <span class="text-slate-500 block text-xs mb-1">当前核心问题</span>
-                            <span class="font-bold text-slate-800">空气炸锅炸篮涂层脱落</span><br>
-                            <span class="text-xs text-slate-500">订单: 37097363832373 (购买90天)</span>
-                        </div>
-                        <div class="bg-slate-100 p-3 rounded border border-slate-200">
-                            <span class="text-slate-500 block text-xs mb-1">责任归属定性</span>
-                            <span class="font-bold text-slate-800">客责 (已知过售后期)</span>
-                        </div>
-                    </div>
+<div class="slide-container" id="slide10">
+    <h2 class="slide-title">第五步：智能操作（人工 vs AI 链路对比）</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div class="box-card" style="border-top: 4px solid #ef4444; background-color: #fff1f2;">
+                <h3 style="color: #be123c; display: flex; align-items: center;"><i class="fa-solid fa-person-digging mr-3"></i>原人工处理链路（繁杂低效）</h3>
+                <div style="margin-top: 25px;">
+                    <p style="font-weight: 700; color: #be123c; font-size: 18px; margin-bottom: 8px;">场景一：提赔链路</p>
+                    <p style="font-size: 15px; color: #475569; margin-bottom: 25px;">需经历查看会话、复制单号、查订单、点赔付、选原因、粘贴备注等跨面板操作，<strong style="color: #ef4444; font-size: 18px;">共计需 15 步点击</strong>。</p>
 
-                    <!-- Solution & Rules -->
-                    <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-4">
-                        <div class="font-bold text-emerald-800 mb-2 flex items-center"><i class="fa-solid fa-lightbulb mr-2"></i>智能建议方案 (最高权限: 体验全额赔付)</div>
-                        <ol class="list-decimal list-inside text-sm text-emerald-700 space-y-1 font-medium">
-                            <li>优先尝试体验金赔付安抚</li>
-                            <li>若用户不接受，执行全额赔付最终方案</li>
-                        </ol>
-                    </div>
+                    <p style="font-weight: 700; color: #be123c; font-size: 18px; margin-bottom: 8px;">场景二：代发/售后链路</p>
+                    <p style="font-size: 15px; color: #475569;">人工需依次核实类目时效、客/商责属性、保证金状态，再填单传凭证。<strong style="color: #ef4444; font-size: 18px;">需点击 20 余次，触发 5 个校验节点</strong>。</p>
+                </div>
+            </div>
+            <div class="box-card" style="border-top: 4px solid #10b981; background-color: #ecfdf5;">
+                <h3 style="color: #047857; display: flex; align-items: center;"><i class="fa-solid fa-microchip mr-3"></i>AI 智能操作链路（极速闭环）</h3>
+                <div style="margin-top: 25px;">
+                    <ul style="padding-left: 20px; color: #064e3b; font-size: 16px; line-height: 1.8;">
+                        <li style="margin-bottom: 15px;"><strong>关键信息免抓取：</strong> AI后台直接搜集单号、用户诉求等关键要素，彻底消除人工复制粘贴。</li>
+                        <li style="margin-bottom: 15px;"><strong>规则条件秒判断：</strong> 系统自动判定类目时效、责任归属、保证金状态，替代人工多节点校验逻辑。</li>
+                        <li><strong>接口直连零点击：</strong> 外呼交互确认方案后，底层直连接口，<strong style="color: #10b981; font-size: 18px;">系统自动完成</strong> 平台服务体验金下发与尝试开启售后入口，直达结单归档。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 30px; background-color: #eff6ff; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid #bfdbfe;">
+            <p style="margin: 0; font-weight: 700; color: #1e3a8a; font-size: 20px;">
+                <i class="fa-solid fa-bolt text-yellow-500 mr-2"></i> 核心转变：从“跨面板、多节点的信息搬运工” 转变为 “一键确认，系统代劳”
+            </p>
+        </div>
+    </div>
+</div>
 
-                    <div class="border border-red-200 rounded-lg p-4 bg-white relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
-                        <div class="font-bold text-slate-800 mb-2 pl-2">⚠️ 实时话术红线拦截</div>
-                        <div class="text-sm space-y-2 pl-2">
-                            <div class="text-emerald-600 flex items-start"><i class="fa-solid fa-check mt-1 mr-2"></i> <span>可进行话术安抚，表达平台理解。</span></div>
-                            <div class="text-red-500 flex items-start font-bold"><i class="fa-solid fa-xmark mt-1 mr-2 text-lg"></i> <span>绝对禁止说：“这是规定”、“我不管商家”、“你自己去联系商家解决”。</span></div>
-                        </div>
-                    </div>
+<div class="slide-container" id="slide11">
+  <h2 class="slide-title">第六步：智能归档（效能极致压缩）</h2>
+  <div class="content-area">
+    <div class="two-column">
+        <div>
+            <h3>全链路交互总结</h3>
+            <p>系统自动回溯外呼录音与用户按键数据，提炼核心结论。无需人工反复收听和跨页面二次录入信息。</p>
+        </div>
+        <div class="box-card">
+            <h3 style="color: #2563eb;">归档耗时对比</h3>
+            <div style="display: flex; align-items: flex-end; gap: 20px; height: 150px; margin-top: 20px;">
+                <div style="flex: 1; text-align: center;">
+                    <div style="background-color: #cbd5e1; height: 120px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #334155; font-weight: 700;">3-4 min</div>
+                    <p style="font-size: 14px; margin-top: 10px;">传统人工</p>
+                </div>
+                <div style="flex: 1; text-align: center;">
+                    <div style="background-color: #2563eb; height: 10px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px;">10s</div>
+                    <p style="font-size: 14px; margin-top: 10px; color: #2563eb; font-weight: 700;">智能模式</p>
                 </div>
             </div>
         </div>
     </div>
+  </div>
+</div>
 
-    <!-- Slide 8: Step 4 - Outbound (Reverted) -->
-    <div class="slide" id="slide-8">
-        <div class="mb-8 shrink-0">
-            <h2 class="text-3xl font-bold mb-2">第四步：外呼沟通</h2>
-            <p class="text-slate-400">人机分流：将标准交互交给AI，人工专注复杂沟通</p>
+<div class="slide-container" id="slide12">
+    <h2 class="slide-title">四、目标达成预估：全链路效能释放</h2>
+    <div class="content-area">
+        <!-- 核心数据卡片区 -->
+        <div style="display: flex; gap: 20px; margin-bottom: 30px;">
+            <div class="box-card" style="flex: 1; text-align: center; padding: 20px;">
+                <p style="color: #64748b; font-weight: 700; font-size: 16px; margin-bottom: 5px;">单兵综合效能提升</p>
+                <div class="big-number" style="font-size: 50px;">118%</div>
+            </div>
+            <div class="box-card" style="flex: 1; text-align: center; border-top: 4px solid #10b981; padding: 20px;">
+                <p style="color: #64748b; font-weight: 700; font-size: 16px; margin-bottom: 5px;">预计释放人力</p>
+                <div class="big-number" style="color: #10b981; font-size: 50px;">67<span style="font-size: 20px;"> 人</span></div>
+            </div>
+            <div class="box-card" style="flex: 1.5; text-align: center; padding: 20px;">
+                <p style="color: #64748b; font-weight: 700; font-size: 16px; margin-bottom: 5px;">单均非沟通耗时 (查询+操作+归档)</p>
+                <p style="font-size: 32px; font-weight: 700; margin: 0; color: #1e3a8a;">
+                    <span style="text-decoration: line-through; color: #94a3b8; font-size: 24px;">7 分钟</span> 
+                    <i class="fa-solid fa-arrow-right mx-3 text-slate-300"></i> 
+                    <span style="color: #2563eb;">30 秒</span>
+                </p>
+            </div>
         </div>
-        <div class="flex-1 flex gap-8 items-center justify-center">
-             <div class="w-1/2 glass-card p-8 border-t-4 border-cyan-500">
-                  <h3 class="text-2xl font-bold text-cyan-400 mb-4"><i class="fa-solid fa-robot mr-2"></i>智能外呼 (AI 试点)</h3>
-                  <p class="text-slate-300 mb-4">基于现有智能外呼能力（简单规则解释、基础按键交互），结合前置推送的服务方案，进行自动化沟通。</p>
-                  <div class="space-y-3">
-                      <div class="bg-slate-800 p-3 rounded border border-slate-600 flex items-center"><i class="fa-solid fa-magnifying-glass text-blue-400 w-8"></i> 查询退款进度</div>
-                      <div class="bg-slate-800 p-3 rounded border border-slate-600 flex items-center"><i class="fa-solid fa-stopwatch text-orange-400 w-8"></i> 催促售后进度</div>
-                      <div class="bg-slate-800 p-3 rounded border border-slate-600 flex items-center"><i class="fa-solid fa-bolt text-yellow-400 w-8"></i> 极速退款咨询</div>
-                  </div>
-             </div>
-             <div class="w-1/2 glass-card p-8 border-t-4 border-indigo-500">
-                  <h3 class="text-2xl font-bold text-indigo-400 mb-4"><i class="fa-solid fa-user-headset mr-2"></i>人工外呼 (兜底与升级)</h3>
-                  <p class="text-slate-300 mb-4">承接AI外呼中的异常跳转，以及复杂的高风险、高情绪用户诉求，提供有温度的安抚与灵活性处理。</p>
-                  <ul class="list-disc pl-5 text-slate-300 space-y-3 mt-6">
-                      <li>处理体验金/赔付谈判</li>
-                      <li>安抚多次投诉/风控预警用户</li>
-                      <li>处理客诉发酵风险工单</li>
-                  </ul>
-             </div>
-        </div>
+
+        <!-- 环节拆解表格 -->
+        <table style="font-size: 14px; background-color: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden;">
+            <thead>
+                <tr>
+                    <th style="width: 20%;">链路环节</th>
+                    <th style="width: 20%;">原耗时 (人工)</th>
+                    <th style="width: 20%; color: #2563eb;">智能耗时</th>
+                    <th style="width: 40%; color: #10b981;">提效收益说明</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="font-weight: 700;">智能派单</td>
+                    <td>1 人专职手动</td>
+                    <td style="font-weight: 700; color: #2563eb;">系统自动</td>
+                    <td style="color: #047857;"><i class="fa-solid fa-arrow-trend-down mr-2"></i>直接省去 1 个专职派单人力</td>
+                </tr>
+                <tr style="background-color: #f8fafc;">
+                    <td style="font-weight: 700;">智能推荐 (查询)</td>
+                    <td>3 分钟</td>
+                    <td style="font-weight: 700; color: #2563eb;">10 秒</td>
+                    <td style="color: #047857;"><i class="fa-solid fa-arrow-trend-down mr-2"></i>系统秒级提取组装准备单，省 2m50s</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 700;">外呼沟通</td>
+                    <td>5 分钟 (全量)</td>
+                    <td style="font-weight: 700; color: #2563eb;">简单0s / 复杂5m</td>
+                    <td style="color: #047857;"><i class="fa-solid fa-robot mr-2"></i>查询等简单场景交由AI，释放人工精力</td>
+                </tr>
+                <tr style="background-color: #f8fafc;">
+                    <td style="font-weight: 700;">智能操作</td>
+                    <td>1 分钟</td>
+                    <td style="font-weight: 700; color: #2563eb;">10 秒</td>
+                    <td style="color: #047857;"><i class="fa-solid fa-arrow-trend-down mr-2"></i>自动下发体验金/开启售后入口，省 50s</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 700;">智能归档</td>
+                    <td>3 分钟</td>
+                    <td style="font-weight: 700; color: #2563eb;">10 秒</td>
+                    <td style="color: #047857;"><i class="fa-solid fa-arrow-trend-down mr-2"></i>AI提炼交互纪要，一键结单，省 2m50s</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
+</div>
 
-    <!-- Slide 9: Step 5 - Operation (Reverted) -->
-    <div class="slide" id="slide-9">
-        <div class="mb-8 shrink-0">
-            <h2 class="text-3xl font-bold mb-2">第五步：智能操作</h2>
-            <p class="text-slate-400">告别人工切换系统，方案确认即系统执行</p>
-        </div>
-        <div class="flex-1 flex flex-col items-center justify-center">
-            <div class="w-full max-w-4xl glass-card p-10 flex items-center justify-between relative">
-                <div class="w-1/3 text-center z-10">
-                    <div class="w-24 h-24 rounded-full bg-slate-800 border-4 border-cyan-500 flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(6,182,212,0.5)]">
-                        <i class="fa-solid fa-comments text-4xl text-cyan-400"></i>
-                    </div>
-                    <h4 class="font-bold text-lg text-white">交互确认方案</h4>
-                    <p class="text-sm text-slate-400 mt-2">通过外呼与用户交互<br>确认认可的最终诉求</p>
-                </div>
-                
-                <div class="flex-1 h-2 bg-slate-700 relative z-0">
-                    <div class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-emerald-500 animate-pulse"></div>
-                </div>
-
-                <div class="w-1/3 text-center z-10">
-                    <div class="w-24 h-24 rounded-full bg-slate-800 border-4 border-emerald-500 flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(16,185,129,0.5)]">
-                        <i class="fa-solid fa-gears text-4xl text-emerald-400"></i>
-                    </div>
-                    <h4 class="font-bold text-lg text-white">系统智能代操</h4>
-                    <p class="text-sm text-slate-400 mt-2">打通系统接口<br>实现智能操作直接归档</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-6 mt-10 w-full max-w-4xl">
-                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
-                    <i class="fa-solid fa-coins text-4xl text-yellow-500 mb-4"></i>
-                    <h4 class="font-bold text-white text-lg mb-1">体验金/赔付</h4>
-                </div>
-                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
-                    <i class="fa-solid fa-box text-4xl text-blue-500 mb-4"></i>
-                    <h4 class="font-bold text-white text-lg mb-1">工单代发</h4>
-                </div>
-                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center">
-                    <i class="fa-solid fa-scissors text-4xl text-red-500 mb-4"></i>
-                    <h4 class="font-bold text-white text-lg mb-1">强退/砍单</h4>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Slide 10: Step 6 - Archiving (Reverted) -->
-    <div class="slide" id="slide-10">
-        <div class="mb-8 shrink-0">
-            <h2 class="text-3xl font-bold mb-2">第六步：智能归档</h2>
-            <p class="text-slate-400">彻底解放收尾工作，实现全链路无缝闭环</p>
-        </div>
-        <div class="flex-1 flex flex-col justify-center">
-            <div class="flex gap-4 items-center">
-                <div class="flex-1 glass-card p-6 border-t-4 border-indigo-500 text-center group">
-                    <div class="bg-indigo-900/50 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-ear-listen text-3xl text-indigo-400"></i>
-                    </div>
-                    <h3 class="font-bold text-lg text-white mb-2">链路提炼</h3>
-                    <p class="text-sm text-slate-400">总结工单处理全链路数据</p>
-                </div>
-                <div class="text-slate-600"><i class="fa-solid fa-chevron-right text-3xl"></i></div>
-                
-                <div class="flex-1 glass-card p-6 border-t-4 border-cyan-500 text-center group">
-                    <div class="bg-cyan-900/50 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-file-pen text-3xl text-cyan-400"></i>
-                    </div>
-                    <h3 class="font-bold text-lg text-white mb-2">生成备注</h3>
-                    <p class="text-sm text-slate-400">自动生成标准工单备注内容</p>
-                </div>
-                <div class="text-slate-600"><i class="fa-solid fa-chevron-right text-3xl"></i></div>
-                
-                <div class="flex-1 glass-card p-6 border-t-4 border-emerald-500 text-center group">
-                    <div class="bg-emerald-900/50 w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-check-double text-3xl text-emerald-400"></i>
-                    </div>
-                    <h3 class="font-bold text-lg text-white mb-2">闭环归档</h3>
-                    <p class="text-sm text-slate-400">系统接管完成结单动作</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Slide 11: Target Achievement -->
-    <div class="slide" id="slide-11">
-        <div class="mb-8 shrink-0">
-            <h2 class="text-3xl font-bold mb-2">四、目标达成预估</h2>
-            <p class="text-slate-400">时效压缩与效能释放核算（单兵提效 118%）</p>
-        </div>
-        
-        <div class="flex-1 flex flex-col items-center justify-center w-full">
-            <!-- Table Matrix -->
-            <div class="w-full max-w-5xl glass-card overflow-hidden mb-4">
-                <table class="w-full text-left border-collapse text-sm">
-                    <thead>
-                        <tr class="bg-slate-800 text-slate-300 tracking-wider">
-                            <th class="p-3 border-b border-slate-700 w-1/5">链路环节</th>
-                            <th class="p-3 border-b border-slate-700 w-1/5">原耗时 (人工)</th>
-                            <th class="p-3 border-b border-slate-700 w-1/5 text-cyan-400">智能耗时</th>
-                            <th class="p-3 border-b border-slate-700 w-2/5 text-emerald-400">提效收益说明</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-slate-200">
-                        <tr class="hover:bg-slate-800/50">
-                            <td class="p-3 border-b border-slate-700 font-bold"><i class="fa-solid fa-network-wired text-indigo-400 mr-2"></i>派单流转</td>
-                            <td class="p-3 border-b border-slate-700">1 人专职手动</td>
-                            <td class="p-3 border-b border-slate-700 font-bold text-cyan-400">系统自动</td>
-                            <td class="p-3 border-b border-slate-700 text-emerald-300"><i class="fa-solid fa-arrow-trend-down mr-1"></i> 直接省去 1 个专职派单人力</td>
-                        </tr>
-                        <tr class="hover:bg-slate-800/50">
-                            <td class="p-3 border-b border-slate-700 font-bold"><i class="fa-solid fa-magnifying-glass text-blue-400 mr-2"></i>查询信息</td>
-                            <td class="p-3 border-b border-slate-700">3 分钟</td>
-                            <td class="p-3 border-b border-slate-700 font-bold text-cyan-400">10 秒</td>
-                            <td class="p-3 border-b border-slate-700 text-emerald-300"><i class="fa-solid fa-arrow-trend-down mr-1"></i> 系统秒级提取组装外呼准备单，省 2m50s</td>
-                        </tr>
-                        <tr class="bg-slate-800/30 hover:bg-slate-800/60">
-                            <td class="p-3 border-b border-slate-700 font-bold"><i class="fa-solid fa-headset text-purple-400 mr-2"></i>外呼沟通</td>
-                            <td class="p-3 border-b border-slate-700">5 分钟 (全量)</td>
-                            <td class="p-3 border-b border-slate-700 font-bold text-purple-300">简单0s/复杂5m</td>
-                            <td class="p-3 border-b border-slate-700 text-slate-300">查询进度等简单场景交由AI外呼，无需人工</td>
-                        </tr>
-                        <tr class="hover:bg-slate-800/50">
-                            <td class="p-3 border-b border-slate-700 font-bold"><i class="fa-solid fa-gears text-orange-400 mr-2"></i>执行操作</td>
-                            <td class="p-3 border-b border-slate-700">1 分钟</td>
-                            <td class="p-3 border-b border-slate-700 font-bold text-cyan-400">10 秒</td>
-                            <td class="p-3 border-b border-slate-700 text-emerald-300"><i class="fa-solid fa-arrow-trend-down mr-1"></i> API系统直连，自动代发/赔付，省 50s</td>
-                        </tr>
-                        <tr class="hover:bg-slate-800/50">
-                            <td class="p-3 border-b border-slate-700 font-bold"><i class="fa-solid fa-box-archive text-yellow-400 mr-2"></i>归档备注</td>
-                            <td class="p-3 border-b border-slate-700">3 分钟</td>
-                            <td class="p-3 border-b border-slate-700 font-bold text-cyan-400">10 秒</td>
-                            <td class="p-3 border-b border-slate-700 text-emerald-300"><i class="fa-solid fa-arrow-trend-down mr-1"></i> AI提炼一键结单，省 2m50s</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Big Number Cards -->
-            <div class="w-full max-w-5xl flex gap-6">
-                <div class="flex-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 p-6 rounded-xl relative overflow-hidden">
-                    <div class="absolute -right-4 -bottom-4 text-slate-700/50 text-6xl"><i class="fa-solid fa-stopwatch"></i></div>
-                    <div class="text-sm text-slate-400 font-bold mb-2">时效压缩底盘</div>
-                    <div class="text-3xl font-black text-white">12min <i class="fa-solid fa-arrow-right text-lg text-slate-500 mx-2"></i> 5.5min</div>
-                    <div class="mt-2 text-sm text-cyan-400">非沟通耗时从 7分钟 断崖降至 30秒</div>
-                </div>
-
-                <div class="flex-1 bg-gradient-to-br from-blue-900 to-indigo-900 border border-blue-700 p-6 rounded-xl relative overflow-hidden shadow-[0_0_20px_rgba(59,130,246,0.3)]">
-                    <div class="absolute -right-4 -bottom-4 text-blue-700/50 text-6xl"><i class="fa-solid fa-rocket"></i></div>
-                    <div class="text-sm text-blue-200 font-bold mb-2">单兵效能提升</div>
-                    <div class="text-4xl font-black text-white">+118%</div>
-                    <div class="mt-2 text-sm text-blue-300">单位时间内处理单量翻倍</div>
-                </div>
-
-                <div class="flex-1 bg-gradient-to-br from-emerald-900 to-teal-900 border border-emerald-700 p-6 rounded-xl relative overflow-hidden shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-                    <div class="absolute -right-4 -bottom-4 text-emerald-700/50 text-6xl"><i class="fa-solid fa-user-group"></i></div>
-                    <div class="text-sm text-emerald-200 font-bold mb-2">盘活/释放人力</div>
-                    <div class="text-4xl font-black text-white">67 <span class="text-lg font-normal">人</span></div>
-                    <div class="mt-2 text-sm text-emerald-300">含 66名一线接线员 + 1名专职派单员</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Navigation Controls -->
-    <div class="nav-btn prev-btn" onclick="prevSlide()"><i class="fa-solid fa-chevron-left text-xl"></i></div>
-    <div class="nav-btn next-btn" onclick="nextSlide()"><i class="fa-solid fa-chevron-right text-xl"></i></div>
-    <div class="page-indicator" id="page-indicator">1 / 11</div>
-
-    <script>
-        let currentSlide = 1;
-        const totalSlides = 11;
-
-        function updateSlides() {
-            document.querySelectorAll('.slide').forEach((el, index) => {
-                if (index + 1 === currentSlide) {
-                    el.classList.add('active');
-                } else {
-                    el.classList.remove('active');
-                }
-            });
-            document.getElementById('page-indicator').innerText = `${currentSlide} / ${totalSlides}`;
-        }
-
-        function nextSlide() {
-            if (currentSlide < totalSlides) {
-                currentSlide++;
-                updateSlides();
-            }
-        }
-
-        function prevSlide() {
-            if (currentSlide > 1) {
-                currentSlide--;
-                updateSlides();
-            }
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === 'Space') {
-                nextSlide();
-            } else if (e.key === 'ArrowLeft') {
-                prevSlide();
-            }
-        });
-    </script>
 </body>
 </html>
